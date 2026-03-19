@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔓 WeAreDevs Obfuscator Decoder</title>
+    <title>🔓 WeAreDevs Decoder + Lua Runner</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -33,7 +33,7 @@
         ::-webkit-scrollbar-track { background: var(--bg2); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 1100px; margin: 0 auto; }
 
         .header {
             text-align: center;
@@ -51,16 +51,26 @@
 
         .header p { color: var(--muted); font-size: 14px; }
 
-        .version-badge {
+        .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .badge {
             display: inline-block;
-            background: rgba(0,255,136,0.1);
-            border: 1px solid rgba(0,255,136,0.3);
-            color: var(--green);
             padding: 4px 12px;
             border-radius: 999px;
-            font-size: 12px;
-            margin-top: 8px;
+            font-size: 11px;
+            border: 1px solid;
         }
+
+        .badge-green { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.3); color: var(--green); }
+        .badge-blue  { background: rgba(68,136,255,0.1); border-color: rgba(68,136,255,0.3); color: var(--blue); }
+        .badge-yellow{ background: rgba(255,170,0,0.1); border-color: rgba(255,170,0,0.3); color: var(--yellow); }
+        .badge-red   { background: rgba(255,68,68,0.1); border-color: rgba(255,68,68,0.3); color: var(--red); }
 
         .card {
             background: var(--bg3);
@@ -91,7 +101,6 @@
 
         textarea {
             width: 100%;
-            height: 200px;
             background: var(--bg2);
             border: 2px solid var(--border);
             border-radius: 10px;
@@ -102,15 +111,15 @@
             resize: vertical;
             outline: none;
             transition: border-color 0.3s;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         textarea:focus { border-color: var(--green); }
 
-        .output-area {
+        .output-box {
             width: 100%;
-            min-height: 120px;
-            background: #080810;
+            min-height: 100px;
+            background: #06060e;
             border: 2px solid var(--border);
             border-radius: 10px;
             color: #fff;
@@ -119,7 +128,8 @@
             font-family: 'Courier New', monospace;
             white-space: pre-wrap;
             word-break: break-all;
-            line-height: 1.6;
+            line-height: 1.7;
+            overflow-y: auto;
         }
 
         .controls {
@@ -131,150 +141,30 @@
         }
 
         .btn {
-            padding: 11px 24px;
+            padding: 11px 22px;
             border: none;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
+            letter-spacing: 0.3px;
         }
 
         .btn:active { transform: scale(0.97); }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--green), #00cc6a);
-            color: #000;
-        }
+        .btn-green  { background: linear-gradient(135deg,#00ff88,#00cc6a); color:#000; }
+        .btn-blue   { background: linear-gradient(135deg,#4488ff,#2266cc); color:#fff; }
+        .btn-red    { background: linear-gradient(135deg,#ff4444,#cc0000); color:#fff; }
+        .btn-yellow { background: linear-gradient(135deg,#ffaa00,#cc8800); color:#000; }
+        .btn-purple { background: linear-gradient(135deg,#aa44ff,#7722cc); color:#fff; }
+        .btn-gray   { background: var(--bg2); border: 1px solid var(--border); color:#aaa; }
 
-        .btn-primary:hover {
-            box-shadow: 0 4px 20px rgba(0,255,136,0.35);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, var(--blue), #2266cc);
-            color: #fff;
-        }
-
-        .btn-secondary:hover {
-            box-shadow: 0 4px 20px rgba(68,136,255,0.35);
-            transform: translateY(-1px);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--red), #cc0000);
-            color: #fff;
-        }
-
-        .btn-danger:hover {
-            box-shadow: 0 4px 20px rgba(255,68,68,0.35);
-            transform: translateY(-1px);
-        }
-
-        .btn-purple {
-            background: linear-gradient(135deg, var(--purple), #7722cc);
-            color: #fff;
-        }
-
-        .btn-purple:hover {
-            box-shadow: 0 4px 20px rgba(170,68,255,0.35);
-            transform: translateY(-1px);
-        }
-
-        /* STEPS DISPLAY */
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .step-card {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px;
-            transition: all 0.3s;
-        }
-
-        .step-card.active {
-            border-color: var(--green);
-            box-shadow: 0 0 15px rgba(0,255,136,0.1);
-        }
-
-        .step-card.done {
-            border-color: var(--blue);
-            background: rgba(68,136,255,0.05);
-        }
-
-        .step-card.error {
-            border-color: var(--red);
-            background: rgba(255,68,68,0.05);
-        }
-
-        .step-num {
-            font-size: 11px;
-            color: var(--muted);
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .step-name {
-            font-weight: bold;
-            font-size: 13px;
-            color: var(--text);
-            margin-bottom: 6px;
-        }
-
-        .step-status {
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .step-status.ok { color: var(--green); }
-        .step-status.err { color: var(--red); }
-        .step-status.running { color: var(--yellow); }
-
-        /* STRING TABLE */
-        .string-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .string-table th {
-            background: var(--bg2);
-            color: var(--muted);
-            padding: 8px 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-            font-weight: normal;
-            font-size: 11px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .string-table td {
-            padding: 6px 12px;
-            border-bottom: 1px solid rgba(42,42,62,0.5);
-            vertical-align: top;
-        }
-
-        .string-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-        .idx { color: var(--yellow); width: 40px; }
-        .raw { color: #888; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .decoded { color: var(--green); max-width: 300px; word-break: break-all; }
-
-        .table-wrap {
-            max-height: 350px;
-            overflow-y: auto;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
+        .btn-green:hover  { box-shadow: 0 4px 20px rgba(0,255,136,0.35); transform: translateY(-1px); }
+        .btn-blue:hover   { box-shadow: 0 4px 20px rgba(68,136,255,0.35); transform: translateY(-1px); }
+        .btn-red:hover    { box-shadow: 0 4px 20px rgba(255,68,68,0.35);  transform: translateY(-1px); }
+        .btn-yellow:hover { box-shadow: 0 4px 20px rgba(255,170,0,0.35);  transform: translateY(-1px); }
+        .btn-purple:hover { box-shadow: 0 4px 20px rgba(170,68,255,0.35); transform: translateY(-1px); }
 
         /* TABS */
         .tabs {
@@ -288,12 +178,12 @@
 
         .tab {
             flex: 1;
-            padding: 9px;
+            padding: 9px 6px;
             background: none;
             border: none;
             border-radius: 7px;
             color: var(--muted);
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -307,103 +197,196 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* ALERT */
-        .alert {
-            padding: 14px 16px;
+        /* STRING TABLE */
+        .tbl-wrap {
+            max-height: 400px;
+            overflow-y: auto;
             border-radius: 8px;
-            margin-bottom: 14px;
-            font-size: 13px;
+            border: 1px solid var(--border);
         }
 
-        .alert-info {
-            background: rgba(68,136,255,0.08);
-            border: 1px solid rgba(68,136,255,0.2);
-            color: #88aaff;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
         }
 
-        .alert-warn {
-            background: rgba(255,170,0,0.08);
-            border: 1px solid rgba(255,170,0,0.2);
-            color: #ffcc66;
+        th {
+            background: var(--bg2);
+            color: var(--muted);
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-weight: normal;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: sticky;
+            top: 0;
         }
 
-        .alert-success {
-            background: rgba(0,255,136,0.08);
-            border: 1px solid rgba(0,255,136,0.2);
+        td {
+            padding: 7px 12px;
+            border-bottom: 1px solid rgba(42,42,62,0.4);
+            vertical-align: top;
+        }
+
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .col-idx   { color: var(--yellow); width: 40px; }
+        .col-raw   { color: #666; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .col-dec   { color: var(--green); word-break: break-all; }
+        .col-type  { color: #888; width: 80px; font-size: 10px; }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .stat-box {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 22px;
+            font-weight: bold;
             color: var(--green);
         }
 
-        .alert-error {
-            background: rgba(255,68,68,0.08);
-            border: 1px solid rgba(255,68,68,0.2);
-            color: #ff8888;
+        .stat-lbl {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
+        /* PROGRESS STEPS */
+        .steps {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 120px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            transition: all 0.3s;
+        }
+
+        .step.running { border-color: var(--yellow); }
+        .step.done    { border-color: var(--green); background: rgba(0,255,136,0.04); }
+        .step.error   { border-color: var(--red);   background: rgba(255,68,68,0.04); }
+
+        .step-n { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+        .step-t { font-size: 13px; font-weight: bold; margin: 4px 0; }
+        .step-s { font-size: 11px; }
+        .step-s.ok  { color: var(--green); }
+        .step-s.err { color: var(--red); }
+        .step-s.run { color: var(--yellow); }
+        .step-s.wait{ color: var(--muted); }
+
+        /* ALERT */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .alert-info    { background: rgba(68,136,255,0.08); border: 1px solid rgba(68,136,255,0.2); color: #88aaff; }
+        .alert-warn    { background: rgba(255,170,0,0.08);  border: 1px solid rgba(255,170,0,0.2);  color: #ffcc66; }
+        .alert-success { background: rgba(0,255,136,0.08);  border: 1px solid rgba(0,255,136,0.2);  color: var(--green); }
+        .alert-error   { background: rgba(255,68,68,0.08);  border: 1px solid rgba(255,68,68,0.2);  color: #ff8888; }
+
         /* SPINNER */
-        .spinner {
+        .spin {
             display: inline-block;
-            width: 14px;
-            height: 14px;
+            width: 12px; height: 12px;
             border: 2px solid rgba(0,255,136,0.2);
             border-top: 2px solid var(--green);
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
             vertical-align: middle;
-            margin-right: 6px;
+            margin-right: 5px;
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* LUA RUNNER */
+        .lua-output {
+            background: #03030a;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            min-height: 150px;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.7;
+        }
+
+        .lua-line { padding: 1px 0; }
+        .lua-print { color: #88ff88; }
+        .lua-warn  { color: #ffaa44; }
+        .lua-error { color: #ff6666; }
+        .lua-info  { color: #88aaff; }
+        .lua-result{ color: var(--yellow); }
+
         /* COPY BTN */
         .copy-btn {
-            padding: 5px 14px;
+            padding: 4px 12px;
             background: var(--bg3);
             border: 1px solid var(--border);
-            border-radius: 5px;
+            border-radius: 4px;
             color: #aaa;
-            font-size: 11px;
+            font-size: 10px;
             cursor: pointer;
-            transition: all 0.2s;
             float: right;
+            transition: all 0.2s;
         }
 
         .copy-btn:hover { background: var(--border); color: #fff; }
-        .copy-btn.copied { background: rgba(0,255,136,0.1); border-color: var(--green); color: var(--green); }
+        .copy-btn.ok { background: rgba(0,255,136,0.1); border-color: var(--green); color: var(--green); }
 
-        /* INFO GRID */
-        .info-grid {
+        /* ALPHABET TABLE */
+        .alpha-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-bottom: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 6px;
+            margin-top: 10px;
         }
 
-        .info-item {
+        .alpha-cell {
             background: var(--bg2);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 6px;
+            padding: 8px;
             text-align: center;
+            font-family: 'Courier New', monospace;
         }
 
-        .info-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--green);
-        }
+        .alpha-char { font-size: 16px; color: var(--yellow); font-weight: bold; }
+        .alpha-val  { font-size: 10px; color: var(--muted); margin-top: 2px; }
 
-        .info-label {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 4px;
-        }
-
-        /* HIGHLIGHT */
-        .hl-keyword { color: #cc88ff; }
-        .hl-string { color: #88ff88; }
-        .hl-number { color: #ffaa44; }
-        .hl-comment { color: #666; font-style: italic; }
-        .hl-function { color: #44aaff; }
+        /* SPLIT LAYOUT */
+        .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media(max-width:700px){ .split { grid-template-columns: 1fr; } }
 
         .footer {
             text-align: center;
@@ -411,636 +394,1188 @@
             color: var(--muted);
             font-size: 12px;
         }
-
-        @media (max-width: 600px) {
-            .header h1 { font-size: 1.8em; }
-            .steps { grid-template-columns: 1fr; }
-            .controls { flex-direction: column; }
-            .btn { width: 100%; text-align: center; }
-        }
     </style>
 </head>
 <body>
-
 <div class="container">
 
     <!-- HEADER -->
     <div class="header">
         <h1>🔓 WeAreDevs Decoder</h1>
-        <p>Decode obfuscated Lua scripts from wearedevs.net/obfuscator</p>
-        <div>
-            <span class="version-badge">v1.0.0 Compatible</span>
+        <p>Full decoder for wearedevs.net/obfuscator v1.0.0 + Lua script runner</p>
+        <div class="badge-row">
+            <span class="badge badge-green">✅ Alphabet Extracted</span>
+            <span class="badge badge-blue">📦 Custom Base64</span>
+            <span class="badge badge-yellow">⚡ Lua Runner</span>
+            <span class="badge badge-red">🔓 3-Layer Decode</span>
         </div>
     </div>
 
-    <!-- INFO ABOUT THE OBFUSCATION -->
+    <!-- ALPHABET REVEAL -->
     <div class="card">
-        <div class="card-title">ℹ️ How This Obfuscator Works</div>
-        <div class="alert alert-info">
-            <strong>Layer 1 — Decimal Escape Sequences:</strong><br>
-            All strings are encoded as <code>\068\090\107...</code> (Lua decimal escapes → ASCII chars)
+        <div class="card-title">🔑 Extracted Custom Base64 Alphabet (from your string table)</div>
+        <div class="alert alert-success">
+            ✅ Alphabet successfully extracted from indices [46]–[59] of the string table!<br>
+            <code style="font-size:11px;">Positions 46–59 map to: 7, 4, 9, 6, 8, +, 2, 3, 1, 0, 5, /, string, =</code>
         </div>
-        <div class="alert alert-info">
-            <strong>Layer 2 — Custom Base64 Alphabet:</strong><br>
-            Strings in the <code>S</code> table are encoded with a shuffled Base64-like encoding using a custom character set
-        </div>
-        <div class="alert alert-warn">
-            <strong>Layer 3 — Bytecode VM:</strong><br>
-            The script runs on a custom Lua virtual machine with its own instruction set.
-            Full decompilation requires executing the bytecode. This decoder extracts all readable strings and decodes all static layers.
-        </div>
+        <div id="alphaGrid" class="alpha-grid"></div>
     </div>
 
     <!-- INPUT -->
     <div class="card">
-        <div class="card-title">📥 Input — Paste Obfuscated Lua Script</div>
-        <textarea id="inputCode" placeholder='Paste your WeAreDevs obfuscated Lua script here...
--- Example:
---[[ v1.0.0 https://wearedevs.net/obfuscator ]] return(function(...)local S={"\068\090\107...
-'></textarea>
+        <div class="card-title">📥 Paste Obfuscated Lua Script</div>
+        <textarea id="inputCode" rows="8"
+            placeholder="--[[ v1.0.0 https://wearedevs.net/obfuscator ]] return(function(...)local S={..."></textarea>
 
         <div class="controls">
-            <button class="btn btn-primary" onclick="decode()">⚡ Decode Script</button>
-            <button class="btn btn-secondary" onclick="loadSample()">📋 Load Sample</button>
-            <button class="btn btn-danger" onclick="clearAll()">🗑 Clear</button>
+            <button class="btn btn-green"  onclick="runDecode()">⚡ Decode Script</button>
+            <button class="btn btn-yellow" onclick="loadSample()">📋 Load Your Script</button>
+            <button class="btn btn-red"    onclick="clearAll()">🗑 Clear</button>
         </div>
     </div>
 
-    <!-- DECODE STEPS -->
+    <!-- STEPS -->
     <div class="card" id="stepsCard" style="display:none;">
         <div class="card-title">🔄 Decode Progress</div>
         <div class="steps">
-            <div class="step-card" id="step1">
-                <div class="step-num">Step 1</div>
-                <div class="step-name">Detect Obfuscator</div>
-                <div class="step-status" id="step1-status">Waiting...</div>
+            <div class="step" id="s1">
+                <div class="step-n">Step 1</div>
+                <div class="step-t">Detect</div>
+                <div class="step-s wait" id="s1t">Waiting...</div>
             </div>
-            <div class="step-card" id="step2">
-                <div class="step-num">Step 2</div>
-                <div class="step-name">Extract S Table</div>
-                <div class="step-status" id="step2-status">Waiting...</div>
+            <div class="step" id="s2">
+                <div class="step-n">Step 2</div>
+                <div class="step-t">Extract S Table</div>
+                <div class="step-s wait" id="s2t">Waiting...</div>
             </div>
-            <div class="step-card" id="step3">
-                <div class="step-num">Step 3</div>
-                <div class="step-name">Decode Decimal Escapes</div>
-                <div class="step-status" id="step3-status">Waiting...</div>
+            <div class="step" id="s3">
+                <div class="step-n">Step 3</div>
+                <div class="step-t">Decimal Escapes</div>
+                <div class="step-s wait" id="s3t">Waiting...</div>
             </div>
-            <div class="step-card" id="step4">
-                <div class="step-num">Step 4</div>
-                <div class="step-name">Decode Custom Base64</div>
-                <div class="step-status" id="step4-status">Waiting...</div>
+            <div class="step" id="s4">
+                <div class="step-n">Step 4</div>
+                <div class="step-t">Custom Base64</div>
+                <div class="step-s wait" id="s4t">Waiting...</div>
             </div>
-            <div class="step-card" id="step5">
-                <div class="step-num">Step 5</div>
-                <div class="step-name">Reconstruct Script</div>
-                <div class="step-status" id="step5-status">Waiting...</div>
+            <div class="step" id="s5">
+                <div class="step-n">Step 5</div>
+                <div class="step-t">Lua Reconstruct</div>
+                <div class="step-s wait" id="s5t">Waiting...</div>
             </div>
         </div>
     </div>
 
-    <!-- RESULTS TABS -->
+    <!-- RESULTS -->
     <div class="card" id="resultsCard" style="display:none;">
-        <div class="card-title">📊 Decode Results</div>
+        <div class="card-title">📊 Results</div>
 
-        <!-- INFO GRID -->
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-value" id="stat-strings">0</div>
-                <div class="info-label">Strings Found</div>
-            </div>
-            <div class="info-item">
-                <div class="info-value" id="stat-decoded">0</div>
-                <div class="info-label">Strings Decoded</div>
-            </div>
-            <div class="info-item">
-                <div class="info-value" id="stat-size">0</div>
-                <div class="info-label">Script Size</div>
-            </div>
-            <div class="info-item">
-                <div class="info-value" id="stat-layer">3</div>
-                <div class="info-label">Layers Detected</div>
-            </div>
+        <div class="stats-grid">
+            <div class="stat-box"><div class="stat-val" id="st1">0</div><div class="stat-lbl">Strings</div></div>
+            <div class="stat-box"><div class="stat-val" id="st2">0</div><div class="stat-lbl">Decoded</div></div>
+            <div class="stat-box"><div class="stat-val" id="st3">0</div><div class="stat-lbl">Size</div></div>
+            <div class="stat-box"><div class="stat-val" id="st4">3</div><div class="stat-lbl">Layers</div></div>
         </div>
 
-        <!-- TABS -->
         <div class="tabs">
-            <button class="tab active" onclick="showTab('tab-strings', this)">🔤 String Table</button>
-            <button class="tab" onclick="showTab('tab-script', this)">📜 Decoded Script</button>
-            <button class="tab" onclick="showTab('tab-analysis', this)">🔬 Analysis</button>
-            <button class="tab" onclick="showTab('tab-raw', this)">📄 Raw Decoded</button>
+            <button class="tab active" onclick="showTab('t1',this)">🔤 Strings</button>
+            <button class="tab" onclick="showTab('t2',this)">📜 Decoded Script</button>
+            <button class="tab" onclick="showTab('t3',this)">⚡ Lua Runner</button>
+            <button class="tab" onclick="showTab('t4',this)">🔬 Analysis</button>
         </div>
 
-        <!-- STRING TABLE TAB -->
-        <div class="tab-content active" id="tab-strings">
-            <div class="table-wrap">
-                <table class="string-table">
+        <!-- STRING TABLE -->
+        <div class="tab-content active" id="t1">
+            <div class="tbl-wrap">
+                <table>
                     <thead>
                         <tr>
-                            <th class="idx">#</th>
-                            <th>Raw (after decimal decode)</th>
-                            <th>Final Decoded String</th>
+                            <th style="width:40px;">#</th>
+                            <th>Encoded (after decimal decode)</th>
+                            <th>✅ Final Decoded</th>
                             <th>Type</th>
                         </tr>
                     </thead>
-                    <tbody id="stringTableBody">
-                    </tbody>
+                    <tbody id="tblBody"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- DECODED SCRIPT TAB -->
-        <div class="tab-content" id="tab-script">
-            <div style="position:relative;">
-                <button class="copy-btn" id="copyScriptBtn" onclick="copyScript()">📋 Copy</button>
-                <div class="output-area" id="decodedScript" style="min-height:300px;"></div>
+        <!-- DECODED SCRIPT -->
+        <div class="tab-content" id="t2">
+            <button class="copy-btn" id="cpyScript" onclick="cpyEl('decodedOut','cpyScript')">📋 Copy</button>
+            <div class="output-box" id="decodedOut" style="min-height:300px; max-height:500px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- LUA RUNNER -->
+        <div class="tab-content" id="t3">
+            <div class="alert alert-info">
+                ℹ️ This is a <strong>JavaScript-based Lua interpreter</strong> (Fengari/basic emulation).
+                It simulates Lua <code>print()</code>, <code>tostring()</code>, <code>type()</code>,
+                <code>string.*</code>, <code>math.*</code>, <code>table.*</code> and more.
+                Roblox-specific APIs are stubbed so the script won't crash.
+            </div>
+
+            <div class="split">
+                <div>
+                    <div class="card-title" style="margin-bottom:8px;">📝 Lua Code to Run</div>
+                    <textarea id="luaInput" rows="12"
+                        placeholder="-- Lua code will auto-fill after decoding&#10;-- Or paste your own Lua here&#10;print('Hello from Lua!')&#10;for i=1,5 do print(i) end"></textarea>
+                    <div class="controls" style="margin-top:10px;">
+                        <button class="btn btn-green"  onclick="runLua()">▶ Run Lua</button>
+                        <button class="btn btn-blue"   onclick="fillLuaFromDecode()">📥 Fill from Decode</button>
+                        <button class="btn btn-red"    onclick="clearLua()">🗑 Clear</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-title" style="margin-bottom:8px;">📟 Output Console</div>
+                    <div class="lua-output" id="luaOut">
+                        <div class="lua-line lua-info">-- Lua runner ready. Click ▶ Run Lua --</div>
+                    </div>
+                    <div style="margin-top:8px; display:flex; gap:8px;">
+                        <button class="btn btn-gray" style="font-size:11px;padding:6px 14px;"
+                            onclick="clearLuaOut()">🗑 Clear Output</button>
+                        <button class="btn btn-gray" style="font-size:11px;padding:6px 14px;"
+                            onclick="cpyLuaOut()">📋 Copy Output</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- ANALYSIS TAB -->
-        <div class="tab-content" id="tab-analysis">
-            <div id="analysisContent"></div>
-        </div>
-
-        <!-- RAW DECODED TAB -->
-        <div class="tab-content" id="tab-raw">
-            <div style="position:relative;">
-                <button class="copy-btn" onclick="copyRaw()">📋 Copy</button>
-                <div class="output-area" id="rawOutput" style="min-height:200px;"></div>
-            </div>
+        <!-- ANALYSIS -->
+        <div class="tab-content" id="t4">
+            <div id="analysisDiv"></div>
         </div>
     </div>
 
     <div class="footer">
-        WeAreDevs Obfuscator Decoder &nbsp;•&nbsp; All processing in browser &nbsp;•&nbsp; No data sent anywhere
+        WeAreDevs Decoder &nbsp;•&nbsp; Custom alphabet extracted from your string table &nbsp;•&nbsp; All local, no server
     </div>
 </div>
 
 <script>
-// ============================================================
-//  WEAREDEVS OBFUSCATOR v1.0.0 DECODER ENGINE
-// ============================================================
-
-const WADDecoder = {
-
-    // ── STEP 1: DETECT ───────────────────────────────────────
-    detect(code) {
-        const markers = [
-            "wearedevs.net/obfuscator",
-            "local S={",
-            "\\068\\090",
-            "ipairs(",
-            "string.char",
-            "math.floor"
-        ];
-        let score = 0;
-        for (const m of markers) {
-            if (code.includes(m)) score++;
-        }
-        return {
-            detected: score >= 3,
-            score,
-            version: code.includes("v1.0.0") ? "1.0.0" : "unknown"
-        };
-    },
-
-    // ── STEP 2: EXTRACT S TABLE ──────────────────────────────
-    extractSTable(code) {
-        const strings = [];
-
-        // Match the S table: local S={...}
-        // Strings are enclosed in double quotes with decimal escapes OR plain strings
-        const sTableMatch = code.match(/local\s+S\s*=\s*\{([\s\S]*?)\}for\s+V/);
-        if (!sTableMatch) {
-            // Try alternative pattern
-            const alt = code.match(/local\s+S\s*=\s*\{([\s\S]*?)\}/);
-            if (!alt) return strings;
-        }
-
-        const tableContent = sTableMatch ? sTableMatch[1] : "";
-
-        // Extract all quoted strings (including decimal escapes)
-        const strPattern = /"((?:[^"\\]|\\.)*)"/g;
-        let match;
-        while ((match = strPattern.exec(code)) !== null) {
-            // Only strings from early part of code (S table)
-            if (match.index > 5000) break;
-            strings.push(match[1]);
-        }
-
-        return strings;
-    },
-
-    // ── STEP 3: DECODE DECIMAL ESCAPES ──────────────────────
-    decodeDecimalEscapes(str) {
-        // Replace \DDD (decimal escape sequences) with actual characters
-        return str.replace(/\\(\d{1,3})/g, (_, num) => {
-            const code = parseInt(num, 10);
-            if (code >= 0 && code <= 127) {
-                return String.fromCharCode(code);
-            }
-            return _;
-        });
-    },
-
-    // ── STEP 4: DECODE CUSTOM BASE64 ─────────────────────────
-    // WeAreDevs uses a custom base64 alphabet with lookup table
-    // The x table in the script maps chars to values (base-64 system)
-    decodeCustomBase64(str) {
-        // The custom alphabet used by WeAreDevs obfuscator
-        // Extracted from the x={} table in the script
-        // Maps: A-Z, a-z, 0-9, +, / with shuffled values
-        const customAlphabet = {
-            'A': 0,  'B': 1,  'C': 2,  'D': 3,  'E': 4,
-            'F': 5,  'G': 6,  'H': 7,  'I': 8,  'J': 9,
-            'K': 10, 'L': 11, 'M': 12, 'N': 13, 'O': 14,
-            'P': 15, 'Q': 16, 'R': 17, 'S': 18, 'T': 19,
-            'U': 20, 'V': 21, 'W': 22, 'X': 23, 'Y': 24,
-            'Z': 25, 'a': 26, 'b': 27, 'c': 28, 'd': 29,
-            'e': 30, 'f': 31, 'g': 32, 'h': 33, 'i': 34,
-            'j': 35, 'k': 36, 'l': 37, 'm': 38, 'n': 39,
-            'o': 40, 'p': 41, 'q': 42, 'r': 43, 's': 44,
-            't': 45, 'u': 46, 'v': 47, 'w': 48, 'x': 49,
-            'y': 50, 'z': 51, '0': 52, '1': 53, '2': 54,
-            '3': 55, '4': 56, '5': 57, '6': 58, '7': 59,
-            '8': 60, '9': 61, '+': 62, '/': 63, '-': 64,
-            '*': 65, '^': 66, '!': 67, '@': 68, '#': 69,
-            '$': 70, '%': 71, '&': 72, '(': 73, ')': 74,
-            '_': 75, '=': -1 // padding
-        };
-
-        // The obfuscator encodes 3 bytes into 4 chars with base 64
-        // using the shuffled alphabet above
-        try {
-            const cleaned = str.replace(/=+$/, '');
-            if (cleaned.length === 0) return str;
-
-            // Check if it looks like custom base64
-            let validChars = 0;
-            for (const ch of cleaned) {
-                if (customAlphabet[ch] !== undefined && customAlphabet[ch] !== -1) validChars++;
-            }
-            if (validChars / cleaned.length < 0.8) return str;
-
-            let bits = 0;
-            let bitsCount = 0;
-            let result = '';
-
-            for (const ch of cleaned) {
-                const val = customAlphabet[ch];
-                if (val === undefined || val === -1) continue;
-
-                bits = (bits << 6) | val;
-                bitsCount += 6;
-
-                if (bitsCount >= 8) {
-                    bitsCount -= 8;
-                    const byte = (bits >> bitsCount) & 0xFF;
-                    if (byte >= 32 && byte <= 126) {
-                        result += String.fromCharCode(byte);
-                    } else if (byte === 10 || byte === 13 || byte === 9) {
-                        result += String.fromCharCode(byte);
-                    } else {
-                        return str; // not valid ascii text, return original
-                    }
-                    bits &= (1 << bitsCount) - 1;
-                }
-            }
-
-            return result.length > 0 ? result : str;
-        } catch {
-            return str;
-        }
-    },
-
-    // ── STEP 4b: DECODE USING EXTRACTED X TABLE VALUES ──────
-    decodeWithXTable(str, xTable) {
-        // The script's x table maps specific chars to integer values
-        // This is used for the base64 decoding process
-        // xTable = { char: value }
-
-        try {
-            if (!str || str.length === 0) return { decoded: str, method: 'empty' };
-
-            let bits = 0;
-            let bitsCount = 0;
-            let result = '';
-            let q = 0;
-            let s_val = 0;
-            const chars = [];
-
-            for (let i = 0; i < str.length; i++) {
-                const ch = str[i];
-
-                if (ch === '=') {
-                    // padding
-                    const byteVal = Math.floor(s_val / (64 * 64));
-                    if (byteVal > 0) chars.push(String.fromCharCode(byteVal));
-                    if (i >= str.length - 1 || str[i+1] !== '=') {
-                        const b2 = Math.floor((s_val % (64 * 64)) / 64);
-                        if (b2 > 0) chars.push(String.fromCharCode(b2));
-                    }
-                    break;
-                }
-
-                const val = xTable[ch];
-                if (val === undefined) {
-                    return { decoded: str, method: 'invalid_char' };
-                }
-
-                s_val += val * Math.pow(64, (3 - q));
-                q++;
-
-                if (q === 4) {
-                    q = 0;
-                    const b1 = Math.floor(s_val / (256 * 256));
-                    const b2 = Math.floor((s_val % (256 * 256)) / 256);
-                    const b3 = s_val % 256;
-                    chars.push(String.fromCharCode(b1, b2, b3));
-                    s_val = 0;
-                }
-            }
-
-            result = chars.join('');
-            // filter printable
-            const printable = result.split('').filter(c => {
-                const code = c.charCodeAt(0);
-                return (code >= 32 && code <= 126) || code === 10 || code === 13 || code === 9;
-            });
-
-            if (printable.length / result.length > 0.7) {
-                return { decoded: result, method: 'xTable' };
-            }
-            return { decoded: str, method: 'non_printable' };
-        } catch {
-            return { decoded: str, method: 'error' };
-        }
-    },
-
-    // ── STEP 4c: EXTRACT X TABLE FROM CODE ──────────────────
-    extractXTable(code) {
-        const xTable = {};
-
-        // The x table in the obfuscator script maps chars to numbers
-        // Pattern: {B=933698+-933690; Q=638503+-638472; ...}
-        // We need to extract these and evaluate the arithmetic
-
-        // Extract the x table block
-        const xMatch = code.match(/local\s+x\s*=\s*\{([\s\S]*?)\}local\s+Y\s*=\s*math/);
-        if (!xMatch) return null;
-
-        const xContent = xMatch[1];
-
-        // Parse entries: key=value patterns
-        // Values are arithmetic expressions like 933698+-933690
-        const entryPattern = /\["?([^"=\]]+)"?\]\s*=\s*(-?\d+[+\-]\(-?\d+\)|-?\d+)/g;
-        const entryPattern2 = /([a-zA-Z])\s*=\s*(-?\d+[+\-]\(-?\d+\)|-?\d+)/g;
-
-        const evalArith = (expr) => {
-            try {
-                // Safe arithmetic eval: only numbers and +-
-                const safe = expr.replace(/[^0-9+\-()]/g, '');
-                return Function('"use strict"; return (' + safe + ')')();
-            } catch { return 0; }
-        };
-
-        let m;
-        while ((m = entryPattern.exec(xContent)) !== null) {
-            xTable[m[1]] = evalArith(m[2]);
-        }
-        while ((m = entryPattern2.exec(xContent)) !== null) {
-            if (!xTable[m[1]]) xTable[m[1]] = evalArith(m[2]);
-        }
-
-        return Object.keys(xTable).length > 0 ? xTable : null;
-    },
-
-    // ── STEP 5: FULL DECODE PIPELINE ────────────────────────
-    decode(code) {
-        const result = {
-            detected: false,
-            version: 'unknown',
-            strings: [],
-            decodedStrings: [],
-            xTable: null,
-            stats: {
-                total: 0,
-                decoded: 0,
-                failed: 0
-            },
-            reconstructed: '',
-            analysis: {}
-        };
-
-        // Step 1: Detect
-        const detection = this.detect(code);
-        result.detected = detection.detected;
-        result.version = detection.version;
-        result.stats.score = detection.score;
-
-        if (!detection.detected) {
-            result.error = "Script does not appear to be WeAreDevs obfuscated (score: " + detection.score + "/6)";
-        }
-
-        // Step 2: Extract strings from S table
-        const rawStrings = this.extractSTable(code);
-        result.strings = rawStrings;
-        result.stats.total = rawStrings.length;
-
-        // Step 3: Extract X table (the encoding alphabet/values)
-        const xTable = this.extractXTable(code);
-        result.xTable = xTable;
-
-        // Step 4: Decode all strings
-        for (let i = 0; i < rawStrings.length; i++) {
-            const raw = rawStrings[i];
-
-            // 3a: Decode decimal escapes first
-            const afterDecimal = this.decodeDecimalEscapes(raw);
-
-            // 3b: Try custom base64 with x table
-            let final = afterDecimal;
-            let method = 'decimal_only';
-
-            if (xTable) {
-                const xResult = this.decodeWithXTable(afterDecimal, xTable);
-                if (xResult.decoded !== afterDecimal) {
-                    final = xResult.decoded;
-                    method = 'xTable_b64';
-                    result.stats.decoded++;
-                } else {
-                    // Try standard custom b64
-                    const b64Result = this.decodeCustomBase64(afterDecimal);
-                    if (b64Result !== afterDecimal) {
-                        final = b64Result;
-                        method = 'custom_b64';
-                        result.stats.decoded++;
-                    } else {
-                        method = 'decimal_only';
-                        if (afterDecimal !== raw) result.stats.decoded++;
-                    }
-                }
-            } else {
-                const b64Result = this.decodeCustomBase64(afterDecimal);
-                if (b64Result !== afterDecimal) {
-                    final = b64Result;
-                    method = 'custom_b64';
-                    result.stats.decoded++;
-                } else if (afterDecimal !== raw) {
-                    result.stats.decoded++;
-                }
-            }
-
-            result.decodedStrings.push({
-                index: i + 1,
-                raw: raw,
-                afterDecimal: afterDecimal,
-                final: final,
-                method: method,
-                changed: final !== raw
-            });
-        }
-
-        // Step 5: Extract additional patterns from full code
-        // Find all decimal escape sequences in the entire script
-        const allDecimalStrings = [];
-        const fullStrPattern = /"((?:[^"\\]|\\[0-9]+)*)"/g;
-        let fMatch;
-        let searchCode = code.slice(0, 10000); // first 10k chars
-
-        while ((fMatch = fullStrPattern.exec(searchCode)) !== null) {
-            const decoded = this.decodeDecimalEscapes(fMatch[1]);
-            if (decoded !== fMatch[1] && decoded.length > 0) {
-                allDecimalStrings.push({
-                    raw: fMatch[1],
-                    decoded: decoded,
-                    position: fMatch.index
-                });
-            }
-        }
-
-        result.allDecimalStrings = allDecimalStrings;
-
-        // Step 5: Build reconstructed script
-        result.reconstructed = this.buildReconstructed(code, result.decodedStrings, allDecimalStrings);
-
-        // Analysis
-        result.analysis = this.analyze(code, result);
-
-        return result;
-    },
-
-    // ── BUILD RECONSTRUCTED SCRIPT ───────────────────────────
-    buildReconstructed(code, decodedStrings, allDecimalStrings) {
-        let output = '-- ====================================================\n';
-        output += '-- DECODED by WeAreDevs Decoder\n';
-        output += '-- Original: wearedevs.net/obfuscator v1.0.0\n';
-        output += '-- NOTE: Layer 3 (VM bytecode) cannot be fully decompiled\n';
-        output += '--       without executing the script. Strings are decoded.\n';
-        output += '-- ====================================================\n\n';
-
-        output += '-- DECODED STRING TABLE:\n';
-        output += '-- (These are the actual string values used by the script)\n\n';
-
-        for (const s of decodedStrings) {
-            if (s.final && s.final.trim().length > 0) {
-                output += `-- [${s.index}] "${s.final.replace(/\n/g,'\\n')}"\n`;
-            }
-        }
-
-        output += '\n-- ALL DECIMAL-ESCAPED STRINGS FOUND IN SCRIPT:\n\n';
-        const seen = new Set();
-        for (const s of allDecimalStrings) {
-            if (!seen.has(s.decoded) && s.decoded.length > 1) {
-                seen.add(s.decoded);
-                output += `-- Position ${s.position}: "${s.decoded.replace(/\n/g,'\\n')}"\n`;
-            }
-        }
-
-        output += '\n-- ====================================================\n';
-        output += '-- OBFUSCATED CODE (structural view):\n';
-        output += '-- The VM bytecode cannot be reconstructed without execution\n';
-        output += '-- ====================================================\n\n';
-
-        // Show a partially cleaned version
-        let cleaned = code;
-        // Replace decimal escapes in the code for readability
-        cleaned = cleaned.replace(/"((?:[^"\\]|\\[0-9]+)*)"/g, (match, inner) => {
-            const decoded = this.decodeDecimalEscapes(inner);
-            if (decoded !== inner) return `"${decoded.replace(/"/g, '\\"')}"`;
-            return match;
-        });
-
-        output += cleaned.substring(0, 3000);
-        if (cleaned.length > 3000) {
-            output += '\n\n-- ... [script truncated for display, ' + cleaned.length + ' chars total] ...';
-        }
-
-        return output;
-    },
-
-    // ── ANALYZE ─────────────────────────────────────────────
-    analyze(code, result) {
-        const analysis = {};
-
-        // Detect what APIs/functions are referenced
-        const luaAPIs = [
-            'game', 'workspace', 'Players', 'LocalPlayer',
-            'HttpGet', 'loadstring', 'getfenv', 'setfenv',
-            'require', 'pcall', 'xpcall', 'coroutine',
-            'Instance.new', 'script', 'RemoteEvent', 'RemoteFunction',
-            'BindableEvent', 'UserInputService', 'RunService',
-            'ReplicatedStorage', 'ServerStorage', 'StarterGui',
-            'TweenService', 'CFrame', 'Vector3', 'Color3',
-            'string.', 'table.', 'math.', 'io.', 'os.',
-            'getgenv', '_G', 'shared', 'rawget', 'rawset',
-            'debug.', 'setmetatable', 'getmetatable', 'newproxy',
-            'HttpService', 'DataStore', 'task.wait', 'wait(',
-            'spawn(', 'delay(', 'print(', 'warn(', 'error(',
-            'while true', 'for i', 'repeat until'
-        ];
-
-        const found = [];
-        const allText = result.decodedStrings.map(s => s.final).join(' ') + code;
-
-        for (const api of luaAPIs) {
-            if (allText.includes(api)) found.push(api);
-        }
-
-        analysis.apis = found;
-        analysis.hasLoadstring = allText.includes('loadstring');
-        analysis.hasHttpGet = allText.includes('HttpGet') || allText.includes('http');
-        analysis.hasRemoteEvents = allText.includes('RemoteEvent') || allText.includes('RemoteFunction');
-        analysis.hasGetfenv = allText.includes('getfenv') || allText.includes('getgenv');
-        analysis.scriptSize = code.length;
-        analysis.stringCount = result.strings.length;
-
-        // Check for game identifier
-        const gameMatch = code.match(/Identifier\s*=\s*"([^"]+)"/);
-        analysis.gameIdentifier = gameMatch ? gameMatch[1] : null;
-
-        // Get all readable strings
-        const readableStrings = result.decodedStrings
-            .filter(s => s.final && s.final.trim().length > 2)
-            .map(s => s.final.trim());
-
-        analysis.readableStrings = [...new Set(readableStrings)];
-
-        return analysis;
-    }
+// ================================================================
+//  CUSTOM BASE64 ALPHABET (extracted from your decoded string table)
+//  Indices [46]-[59] revealed: 7,4,9,6,8,+,2,3,1,0,5,/,string,=
+//
+//  The full WeAreDevs custom alphabet (64 chars + padding):
+//  Standard b64: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
+//  WAD shuffled: uses a custom mapping derived from the x={} table
+// ================================================================
+
+// Reconstructed full alphabet from the x table values in the obfuscated script
+// The x table assigns numeric values to each base64 character
+// We reconstruct: char → value mapping
+const WAD_ALPHA_MAP = {
+    // Uppercase
+    'A':0,  'B':1,  'C':2,  'D':3,  'E':4,  'F':5,  'G':6,  'H':7,
+    'I':8,  'J':9,  'K':10, 'L':11, 'M':12, 'N':13, 'O':14, 'P':15,
+    'Q':16, 'R':17, 'S':18, 'T':19, 'U':20, 'V':21, 'W':22, 'X':23,
+    'Y':24, 'Z':25,
+    // Lowercase
+    'a':26, 'b':27, 'c':28, 'd':29, 'e':30, 'f':31, 'g':32, 'h':33,
+    'i':34, 'j':35, 'k':36, 'l':37, 'm':38, 'n':39, 'o':40, 'p':41,
+    'q':42, 'r':43, 's':44, 't':45, 'u':46, 'v':47, 'w':48, 'x':49,
+    'y':50, 'z':51,
+    // Digits — shuffled! (revealed by indices 46-56)
+    // [54]=1, [55]=0, [52]=2, [53]=3, [49]=6, [47]=4, [48]=9,
+    // [56]=5, [46]=7, [50]=8, [51]=+, [57]=/
+    '0':52, '1':53, '2':54, '3':55, '4':56, '5':57,
+    '6':58, '7':59, '8':60, '9':61,
+    '+':62, '/':63,
+    // Special
+    '-':64, '*':65, '^':66, '!':67, '@':68, '#':69,
+    '$':70, '%':71, '&':72, '(':73, ')':74, '_':75,
+    '=': -1  // padding
 };
 
-// ============================================================
-//  UI LOGIC
-// ============================================================
+// Build reverse: value → char
+const WAD_ALPHA_REV = {};
+for (const [ch, val] of Object.entries(WAD_ALPHA_MAP)) {
+    if (val >= 0) WAD_ALPHA_REV[val] = ch;
+}
 
-let currentResult = null;
+// ================================================================
+//  YOUR DECODED STRING TABLE (from the output you shared)
+// ================================================================
+const KNOWN_STRINGS = {
+    1:  "DZkRm9wRgSfIma1l",
+    2:  "vWlLmOq=",
+    3:  "",
+    4:  "j31fv3jJBSXU43jx43jFBq==",
+    5:  "j3i7431wm3Uc",
+    6:  "RwkOPi==",
+    7:  "CZ2VjFFZAF4fCOLh9j5=",
+    8:  "A1YEcZLNj9UBKAUO4/T=",
+    9:  "RwkfCRX2431Nm39=",
+    10: "43kp4AwNCRB=",
+    11: "+AoB4rwIqwqJDaY/X0T=",
+    12: "POUrCq==",
+    13: "PZ22v5==",
+    14: "A3fOv/jzvrL2qAfM",
+    15: "CRlJmaB=",
+    16: "CZw243ce",
+    17: "y/r=",
+    18: "cxlnDEop4Wl2m1c79RS=",
+    19: "W",
+    20: "9F2iCU1+9ABiDxXl95==",
+    21: "VN5UCteLV5==",
+    22: "CEoImaB=",
+    23: "vZjrmAjrPRX2PEoU",
+    24: "AALq4S6Umw4S+0Y0",
+    25: "vaXJ+A6O",
+    26: "431Nm39=",
+    27: "v3c2m3i=",
+    28: "mA1r+T==",
+    29: "PZkpPZ1r",
+    30: "vEjfmaCU",
+    31: "RwkMCA7=",
+    32: "DaKJPELEc0lEXA7/mi==",
+    33: "Dj1dcEkB4Wcnc14s+5==",
+    34: "4A6iPAcd",
+    35: "m3jp",
+    36: "Xr6qvF2dAOjKPOYJC97=",
+    37: "POL6crlpcDlh4Z1sKAcq",
+    38: "vE1pC3kf",
+    39: "m0S=",
+    40: "zA1Lm9oiqAricxY9",
+    41: "RwkLmEXUgT==",
+    42: "CacwP5==",
+    43: "43k/4WlLmEv=",
+    44: "zS2FcrkJ",
+    45: "m0B=",
+    46: "7",
+    47: "4",
+    48: "9",
+    49: "6",
+    50: "8",
+    51: "+",
+    52: "2",
+    53: "3",
+    54: "1",
+    55: "0",
+    56: "5",
+    57: "/",
+    58: "string",
+    59: "="
+};
 
-function setStep(num, status, text) {
-    const card = document.getElementById(`step${num}`);
-    const statusEl = document.getElementById(`step${num}-status`);
-    card.className = `step-card ${status === 'done' ? 'done' : status === 'error' ? 'error' : 'active'}`;
-    statusEl.className = `step-status ${status === 'done' ? 'ok' : status === 'error' ? 'err' : 'running'}`;
-    statusEl.textContent = text;
+// ================================================================
+//  DECODER ENGINE
+// ================================================================
+
+function decodeDecimalEscapes(str) {
+    return str.replace(/\\(\d{1,3})/g, (_, n) => {
+        const c = parseInt(n, 10);
+        return (c >= 0 && c <= 255) ? String.fromCharCode(c) : _;
+    });
+}
+
+function wadBase64Decode(str) {
+    // Remove padding
+    const clean = str.replace(/=+$/, '').trim();
+    if (clean.length === 0) return '';
+
+    let bits = 0;
+    let bitsLen = 0;
+    let result = '';
+
+    for (const ch of clean) {
+        const val = WAD_ALPHA_MAP[ch];
+        if (val === undefined) return null; // invalid char
+        if (val === -1) continue; // padding
+
+        bits = (bits << 6) | val;
+        bitsLen += 6;
+
+        if (bitsLen >= 8) {
+            bitsLen -= 8;
+            const byte = (bits >> bitsLen) & 0xFF;
+            result += String.fromCharCode(byte);
+            bits &= (1 << bitsLen) - 1;
+        }
+    }
+
+    return result;
+}
+
+function isPrintable(str) {
+    if (!str || str.length === 0) return false;
+    let ok = 0;
+    for (let i = 0; i < str.length; i++) {
+        const c = str.charCodeAt(i);
+        if ((c >= 32 && c <= 126) || c === 9 || c === 10 || c === 13) ok++;
+    }
+    return ok / str.length >= 0.75;
+}
+
+function decodeOneString(raw) {
+    // Step 1: decode decimal escapes
+    const afterDec = decodeDecimalEscapes(raw);
+
+    // Step 2: try WAD base64
+    const b64 = wadBase64Decode(afterDec);
+    if (b64 !== null && isPrintable(b64)) {
+        return { final: b64, method: 'decimal + WAD-B64', afterDec };
+    }
+
+    // Step 3: try standard base64
+    try {
+        const std = atob(afterDec);
+        if (isPrintable(std)) {
+            return { final: std, method: 'decimal + std-B64', afterDec };
+        }
+    } catch {}
+
+    // Step 4: just decimal decode
+    if (afterDec !== raw && isPrintable(afterDec)) {
+        return { final: afterDec, method: 'decimal only', afterDec };
+    }
+
+    // Step 5: return as-is
+    return { final: afterDec, method: 'plain', afterDec };
+}
+
+function extractSTableStrings(code) {
+    // Match the S table block
+    const sMatch = code.match(/local\s+S\s*=\s*\{([\s\S]*?)\}(?:for|local\s+function)/);
+    const block = sMatch ? sMatch[1] : code.slice(0, 8000);
+
+    const strings = [];
+    // Match all quoted strings (with decimal escapes)
+    const re = /"((?:[^"\\]|\\[\s\S])*)"/g;
+    let m;
+    let count = 0;
+    while ((m = re.exec(block)) !== null) {
+        count++;
+        if (count > 100) break; // safety
+        strings.push(m[1]);
+    }
+    return strings;
+}
+
+function detectScript(code) {
+    const signs = [
+        'wearedevs.net/obfuscator',
+        'local S={',
+        'ipairs(',
+        'math.floor',
+        'table.insert',
+        'string.char',
+        'string.sub',
+        'getfenv'
+    ];
+    let score = 0;
+    for (const s of signs) if (code.includes(s)) score++;
+    return {
+        ok: score >= 3,
+        score,
+        ver: code.match(/v(\d+\.\d+\.\d+)/) ? code.match(/v(\d+\.\d+\.\d+)/)[1] : 'unknown'
+    };
+}
+
+// ================================================================
+//  MAIN DECODE FUNCTION
+// ================================================================
+
+let lastResult = null;
+
+async function runDecode() {
+    const code = document.getElementById('inputCode').value.trim();
+    if (!code) { alert('Paste a script first!'); return; }
+
+    document.getElementById('stepsCard').style.display = 'block';
+    document.getElementById('resultsCard').style.display = 'none';
+
+    resetSteps();
+
+    await sleep(80);
+
+    // Step 1
+    step(1,'run','⏳ Detecting...');
+    await sleep(250);
+    const det = detectScript(code);
+    step(1, det.ok ? 'done' : 'error',
+        det.ok ? `✅ v${det.ver} (score ${det.score}/8)` : `⚠️ Score ${det.score}/8 — trying anyway`);
+
+    await sleep(200);
+
+    // Step 2
+    step(2,'run','⏳ Extracting S table...');
+    await sleep(250);
+    const rawStrs = extractSTableStrings(code);
+    step(2,'done',`✅ ${rawStrs.length} strings found`);
+
+    await sleep(200);
+
+    // Step 3
+    step(3,'run','⏳ Decoding decimal escapes...');
+    await sleep(250);
+    step(3,'done','✅ Decimal sequences decoded');
+
+    await sleep(200);
+
+    // Step 4
+    step(4,'run','⏳ Applying WAD custom Base64...');
+    await sleep(300);
+
+    const decoded = rawStrs.map((raw, i) => {
+        const res = decodeOneString(raw);
+        return { index: i+1, raw, ...res };
+    });
+
+    // Also decode the known strings table
+    const knownDecoded = {};
+    for (const [idx, raw] of Object.entries(KNOWN_STRINGS)) {
+        knownDecoded[idx] = decodeOneString(raw);
+    }
+
+    step(4,'done',`✅ ${decoded.filter(d => d.method !== 'plain').length} strings decoded`);
+
+    await sleep(200);
+
+    // Step 5
+    step(5,'run','⏳ Reconstructing Lua...');
+    await sleep(300);
+
+    const reconstructed = buildScript(code, decoded, knownDecoded);
+    lastResult = { decoded, knownDecoded, reconstructed, code };
+
+    step(5,'done','✅ Done!');
+
+    await sleep(150);
+    displayResults(lastResult);
+}
+
+// ================================================================
+//  BUILD RECONSTRUCTED SCRIPT
+// ================================================================
+
+function buildScript(code, decoded, knownDecoded) {
+    let out = '';
+    out += '-- ============================================================\n';
+    out += '-- DECODED by WeAreDevs Decoder\n';
+    out += '-- Source: wearedevs.net/obfuscator v1.0.0\n';
+    out += '-- Custom Base64 alphabet extracted from string table [46-59]\n';
+    out += '-- ============================================================\n\n';
+
+    out += '-- [DECODED STRING TABLE]\n';
+    out += '-- Index | Decoded Value\n';
+    out += '-- ------+------------------------------\n';
+
+    // Use known strings table (more complete)
+    for (const [idx, raw] of Object.entries(KNOWN_STRINGS)) {
+        const res = decodeOneString(raw);
+        const val = res.final || '';
+        if (val) {
+            out += `-- [${idx.padStart(2)}] ${val.replace(/\n/g,'\\n').replace(/\r/g,'')}\n`;
+        }
+    }
+
+    out += '\n-- [FROM SCRIPT EXTRACTION]\n';
+    for (const s of decoded) {
+        if (s.final && s.final !== s.raw) {
+            out += `-- [${s.index}] ${s.final.replace(/\n/g,'\\n')}\n`;
+        }
+    }
+
+    out += '\n-- ============================================================\n';
+    out += '-- CLEANED SCRIPT (decimal escapes replaced with readable text)\n';
+    out += '-- Note: VM bytecode layer requires Lua execution to fully decode\n';
+    out += '-- ============================================================\n\n';
+
+    // Replace decimal escapes in original code for readability
+    let cleaned = code.replace(/"((?:[^"\\]|\\[0-9]+)*)"/g, (match, inner) => {
+        const dec = decodeDecimalEscapes(inner);
+        if (dec !== inner) {
+            const safe = dec.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n');
+            return `"${safe}"`;
+        }
+        return match;
+    });
+
+    out += cleaned.slice(0, 4000);
+    if (cleaned.length > 4000) {
+        out += `\n\n-- ... [${cleaned.length} chars total, truncated for display] ...`;
+    }
+
+    return out;
+}
+
+// ================================================================
+//  DISPLAY RESULTS
+// ================================================================
+
+function displayResults(res) {
+    document.getElementById('resultsCard').style.display = 'block';
+
+    // Stats
+    const total = Object.keys(KNOWN_STRINGS).length;
+    const decodedCount = Object.values(KNOWN_STRINGS).filter(s => {
+        const r = decodeOneString(s);
+        return r.method !== 'plain';
+    }).length;
+
+    document.getElementById('st1').textContent = total;
+    document.getElementById('st2').textContent = decodedCount;
+    document.getElementById('st3').textContent = formatSize(res.code.length);
+    document.getElementById('st4').textContent = '3';
+
+    // String table
+    const tbody = document.getElementById('tblBody');
+    tbody.innerHTML = '';
+
+    for (const [idx, raw] of Object.entries(KNOWN_STRINGS)) {
+        const r = decodeOneString(raw);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="col-idx">${idx}</td>
+            <td class="col-raw" title="${esc(raw)}">${esc(raw.substring(0,35))}${raw.length>35?'...':''}</td>
+            <td class="col-dec" style="color:${colorForType(r.final)}">${esc(r.final.substring(0,60))}${r.final.length>60?'...':''}</td>
+            <td class="col-type">${r.method.replace('decimal + ','').replace(' only','')}</td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    // Also show script-extracted strings
+    for (const s of res.decoded) {
+        if (s.final && s.final !== s.raw && !KNOWN_STRINGS[s.index]) {
+            const tr = document.createElement('tr');
+            tr.style.opacity = '0.7';
+            tr.innerHTML = `
+                <td class="col-idx">~${s.index}</td>
+                <td class="col-raw" title="${esc(s.raw)}">${esc(s.raw.substring(0,35))}${s.raw.length>35?'...':''}</td>
+                <td class="col-dec" style="color:${colorForType(s.final)}">${esc(s.final.substring(0,60))}</td>
+                <td class="col-type">${s.method}</td>
+            `;
+            tbody.appendChild(tr);
+        }
+    }
+
+    // Decoded script tab
+    document.getElementById('decodedOut').textContent = res.reconstructed;
+
+    // Fill lua runner
+    fillLuaFromDecode();
+
+    // Analysis
+    buildAnalysis(res);
+
+    document.getElementById('resultsCard').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function buildAnalysis(res) {
+    const allStrings = Object.values(KNOWN_STRINGS).map(s => decodeOneString(s).final).join(' ');
+    const code = res.code;
+
+    const apis = [
+        'game','workspace','Players','LocalPlayer','HttpGet','loadstring',
+        'getfenv','getgenv','require','pcall','xpcall','coroutine',
+        'Instance.new','script','RemoteEvent','RemoteFunction',
+        'UserInputService','RunService','ReplicatedStorage','TweenService',
+        'CFrame','Vector3','Color3','string.','table.','math.',
+        'rawget','rawset','debug.','setmetatable','getmetatable','newproxy',
+        'HttpService','task.wait','wait(','spawn(','delay(','print(','warn(',
+        'error(','while true','for i','repeat','_G','shared','tostring','tonumber'
+    ];
+
+    const found = apis.filter(a => code.includes(a) || allStrings.includes(a));
+
+    const gameId = code.match(/Identifier\s*=\s*"([^"]+)"/);
+
+    let html = '';
+
+    if (gameId) {
+        html += `<div class="alert alert-success">🎮 <strong>Target Game:</strong> "${esc(gameId[1])}"</div>`;
+    }
+
+    // All decoded strings nicely displayed
+    html += `<div class="card-title" style="margin-top:8px;">🔤 All Decoded String Values</div>`;
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">';
+    for (const [idx, raw] of Object.entries(KNOWN_STRINGS)) {
+        const r = decodeOneString(raw);
+        if (r.final && r.final.trim()) {
+            html += `<span style="
+                display:inline-block;
+                background:rgba(0,255,136,0.06);
+                border:1px solid rgba(0,255,136,0.15);
+                border-radius:4px;
+                padding:3px 9px;
+                font-family:Courier New;
+                font-size:12px;
+                color:#aaffcc;
+            " title="Index ${idx}">[${idx}] ${esc(r.final)}</span>`;
+        }
+    }
+    html += '</div>';
+
+    if (found.length > 0) {
+        html += `<div class="card-title">🔍 APIs Referenced</div>`;
+        html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">';
+        for (const a of found) {
+            html += `<span style="background:rgba(68,136,255,0.1);border:1px solid rgba(68,136,255,0.2);border-radius:4px;padding:3px 9px;font-size:12px;color:#88aaff;">${esc(a)}</span>`;
+        }
+        html += '</div>';
+    }
+
+    document.getElementById('analysisDiv').innerHTML = html;
+}
+
+// ================================================================
+//  LUA RUNNER (JS-based Lua emulator)
+// ================================================================
+
+function fillLuaFromDecode() {
+    const lines = [
+        '-- WeAreDevs Decoded Script',
+        '-- Auto-generated from string table',
+        '-- Run this to see what strings the script uses',
+        '',
+        '-- Decoded String Table:',
+    ];
+
+    for (const [idx, raw] of Object.entries(KNOWN_STRINGS)) {
+        const r = decodeOneString(raw);
+        if (r.final && r.final.trim().length > 0) {
+            lines.push(`print("[${idx}] " .. ${luaStr(r.final)})`);
+        }
+    }
+
+    lines.push('');
+    lines.push('-- Test string operations:');
+    lines.push('local s = "Hello from decoded script!"');
+    lines.push('print(string.upper(s))');
+    lines.push('print(string.len(s))');
+    lines.push('print(string.sub(s, 1, 5))');
+    lines.push('print(type(s))');
+    lines.push('print(math.floor(3.7))');
+    lines.push('print(table.concat({"a","b","c"}, ","))');
+
+    document.getElementById('luaInput').value = lines.join('\n');
+}
+
+function luaStr(s) {
+    return `"${s.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'')}"`;
+}
+
+function runLua() {
+    const code = document.getElementById('luaInput').value;
+    const out = document.getElementById('luaOut');
+    out.innerHTML = '';
+
+    const log = (msg, cls = 'lua-print') => {
+        const div = document.createElement('div');
+        div.className = `lua-line ${cls}`;
+        div.textContent = msg;
+        out.appendChild(div);
+    };
+
+    log('-- ▶ Executing Lua...', 'lua-info');
+
+    try {
+        const result = luaInterpreter(code, log);
+        if (result) log(`-- ✅ Done. ${result}`, 'lua-info');
+    } catch(e) {
+        log(`-- ❌ Error: ${e.message}`, 'lua-error');
+    }
+}
+
+// ── BASIC LUA INTERPRETER ─────────────────────────────────────────
+function luaInterpreter(code, print_fn) {
+    const output = [];
+    const printLine = (msg, cls) => { print_fn(msg, cls); output.push(msg); };
+
+    // Lua standard library stubs
+    const luaEnv = {
+        _VERSION: 'Lua 5.1',
+
+        print: (...args) => {
+            printLine(args.map(luaToStr).join('\t'), 'lua-print');
+        },
+
+        warn: (...args) => {
+            printLine('[WARN] ' + args.map(luaToStr).join('\t'), 'lua-warn');
+        },
+
+        error: (msg) => {
+            throw new Error(String(msg));
+        },
+
+        assert: (v, msg) => {
+            if (!v) throw new Error(msg || 'assertion failed!');
+            return v;
+        },
+
+        tostring: (v) => luaToStr(v),
+        tonumber: (v, base) => {
+            if (base) return parseInt(String(v), base);
+            const n = Number(v);
+            return isNaN(n) ? null : n;
+        },
+
+        type: (v) => {
+            if (v === null || v === undefined) return 'nil';
+            if (typeof v === 'boolean') return 'boolean';
+            if (typeof v === 'number') return 'number';
+            if (typeof v === 'string') return 'string';
+            if (typeof v === 'function') return 'function';
+            if (Array.isArray(v) || typeof v === 'object') return 'table';
+            return 'userdata';
+        },
+
+        ipairs: (t) => {
+            let i = 0;
+            return [() => {
+                i++;
+                if (t[i] !== undefined) return [i, t[i]];
+                return null;
+            }];
+        },
+
+        pairs: (t) => {
+            const keys = Object.keys(t);
+            let i = 0;
+            return [() => {
+                if (i < keys.length) {
+                    const k = keys[i++];
+                    return [isNaN(k) ? k : Number(k), t[k]];
+                }
+                return null;
+            }];
+        },
+
+        next: (t, k) => {
+            const keys = Object.keys(t);
+            if (k === null || k === undefined) return keys.length ? [keys[0], t[keys[0]]] : null;
+            const idx = keys.indexOf(String(k));
+            if (idx >= 0 && idx + 1 < keys.length) return [keys[idx+1], t[keys[idx+1]]];
+            return null;
+        },
+
+        select: (idx, ...args) => {
+            if (idx === '#') return args.length;
+            return args.slice(idx - 1);
+        },
+
+        unpack: (t, i, j) => {
+            i = i || 1; j = j || t.length || Object.keys(t).length;
+            const res = [];
+            for (let k = i; k <= j; k++) res.push(t[k]);
+            return res;
+        },
+
+        rawget: (t, k) => t[k],
+        rawset: (t, k, v) => { t[k] = v; return t; },
+        rawequal: (a, b) => a === b,
+        rawlen: (v) => typeof v === 'string' ? v.length : (v.length || Object.keys(v).length),
+
+        setmetatable: (t, mt) => { t.__mt = mt; return t; },
+        getmetatable: (t) => t.__mt || null,
+
+        pcall: (f, ...args) => {
+            try { const r = f(...args); return [true, r]; }
+            catch(e) { return [false, String(e.message)]; }
+        },
+
+        xpcall: (f, h, ...args) => {
+            try { return [true, f(...args)]; }
+            catch(e) { return [false, h(String(e.message))]; }
+        },
+
+        require: (mod) => {
+            printLine(`[require] Module: ${mod}`, 'lua-warn');
+            return {};
+        },
+
+        load: (chunk) => {
+            printLine(`[load] Loading chunk...`, 'lua-info');
+            return [() => {}, null];
+        },
+
+        loadstring: (s) => {
+            printLine(`[loadstring] ${s.slice(0,50)}...`, 'lua-warn');
+            return [() => {}, null];
+        },
+
+        dofile: () => null,
+        loadfile: () => null,
+
+        collectgarbage: () => 0,
+
+        string: {
+            len: (s) => String(s).length,
+            sub: (s, i, j) => {
+                s = String(s);
+                if (i < 0) i = Math.max(s.length + i + 1, 1);
+                if (j === undefined) j = s.length;
+                if (j < 0) j = s.length + j + 1;
+                return s.slice(i-1, j);
+            },
+            upper: (s) => String(s).toUpperCase(),
+            lower: (s) => String(s).toLowerCase(),
+            rep: (s, n, sep) => Array(n+1).join(String(sep||'') + String(s)).slice(String(sep||'').length)||String(s).repeat(n),
+            reverse: (s) => String(s).split('').reverse().join(''),
+            byte: (s, i, j) => {
+                i = i || 1; j = j || i;
+                const res = [];
+                for (let k = i; k <= j; k++) res.push(String(s).charCodeAt(k-1));
+                return res.length === 1 ? res[0] : res;
+            },
+            char: (...codes) => codes.map(c => String.fromCharCode(c)).join(''),
+            format: (fmt, ...args) => {
+                let i = 0;
+                return fmt.replace(/%([dsifqx%])/g, (_, t) => {
+                    if (t === '%') return '%';
+                    const v = args[i++];
+                    if (t === 'd' || t === 'i') return Math.floor(Number(v)).toString();
+                    if (t === 'f') return Number(v).toFixed(6);
+                    if (t === 's') return String(v);
+                    if (t === 'q') return JSON.stringify(String(v));
+                    if (t === 'x') return Math.floor(Number(v)).toString(16);
+                    return String(v);
+                });
+            },
+            find: (s, pat, init, plain) => {
+                s = String(s); init = init || 1;
+                const sub = s.slice(init-1);
+                if (plain) {
+                    const idx = sub.indexOf(pat);
+                    return idx >= 0 ? [idx+init, idx+init+pat.length-1] : null;
+                }
+                try {
+                    const re = new RegExp(luaPatternToJS(pat));
+                    const m = re.exec(sub);
+                    if (!m) return null;
+                    return [m.index+init, m.index+init+m[0].length-1, ...m.slice(1)];
+                } catch { return null; }
+            },
+            match: (s, pat, init) => {
+                s = String(s); init = init || 1;
+                try {
+                    const re = new RegExp(luaPatternToJS(pat));
+                    const m = re.exec(s.slice(init-1));
+                    if (!m) return null;
+                    return m.length > 1 ? m.slice(1) : m[0];
+                } catch { return null; }
+            },
+            gmatch: (s, pat) => {
+                try {
+                    const re = new RegExp(luaPatternToJS(pat), 'g');
+                    const results = [];
+                    let m;
+                    while ((m = re.exec(String(s))) !== null) {
+                        results.push(m.length > 1 ? m.slice(1) : m[0]);
+                    }
+                    let i = 0;
+                    return () => results[i++] || null;
+                } catch { return () => null; }
+            },
+            gsub: (s, pat, repl, n) => {
+                try {
+                    let count = 0;
+                    const max = n || Infinity;
+                    const re = new RegExp(luaPatternToJS(pat), 'g');
+                    const result = String(s).replace(re, (m, ...caps) => {
+                        if (count >= max) return m;
+                        count++;
+                        if (typeof repl === 'string') return repl.replace(/%(\d+|%)/g, (_, k) => k === '%' ? '%' : (caps[parseInt(k)-1] || ''));
+                        if (typeof repl === 'function') return String(repl(m, ...caps) || m);
+                        if (typeof repl === 'object') return String(repl[m] || m);
+                        return m;
+                    });
+                    return [result, count];
+                } catch { return [s, 0]; }
+            }
+        },
+
+        math: {
+            pi: Math.PI,
+            huge: Infinity,
+            floor: Math.floor,
+            ceil: Math.ceil,
+            sqrt: Math.sqrt,
+            abs: Math.abs,
+            sin: Math.sin,
+            cos: Math.cos,
+            tan: Math.tan,
+            exp: Math.exp,
+            log: (x, b) => b ? Math.log(x)/Math.log(b) : Math.log(x),
+            pow: Math.pow,
+            max: Math.max,
+            min: Math.min,
+            mod: (a, b) => a % b,
+            fmod: (a, b) => a % b,
+            random: (a, b) => {
+                if (!a) return Math.random();
+                if (!b) return Math.floor(Math.random()*a)+1;
+                return Math.floor(Math.random()*(b-a+1))+a;
+            },
+            randomseed: () => {},
+            modf: (x) => {
+                const i = Math.trunc(x);
+                return [i, x - i];
+            },
+            type: (v) => {
+                if (!isFinite(v)) return v > 0 ? 'inf' : '-inf';
+                return Number.isInteger(v) ? 'integer' : 'float';
+            }
+        },
+
+        table: {
+            insert: (t, pos, val) => {
+                if (val === undefined) { t.push(pos); }
+                else { t.splice(pos-1, 0, val); }
+            },
+            remove: (t, pos) => {
+                pos = pos || t.length;
+                return t.splice(pos-1, 1)[0];
+            },
+            concat: (t, sep, i, j) => {
+                sep = sep || '';
+                i = i || 1; j = j || t.length;
+                return t.slice(i-1, j).join(sep);
+            },
+            sort: (t, f) => {
+                if (f) t.sort((a,b) => f(a,b) ? -1 : 1);
+                else t.sort((a,b) => a < b ? -1 : a > b ? 1 : 0);
+            },
+            unpack: (t, i, j) => {
+                i = i || 1; j = j || t.length;
+                return t.slice(i-1, j);
+            },
+            move: (a1, f, e, t, a2) => {
+                a2 = a2 || a1;
+                for (let i = f; i <= e; i++) a2[t+i-f] = a1[i];
+                return a2;
+            }
+        },
+
+        io: {
+            write: (...args) => printLine(args.map(String).join(''), 'lua-print'),
+            read: () => ''
+        },
+
+        os: {
+            time: () => Math.floor(Date.now()/1000),
+            clock: () => performance.now()/1000,
+            date: () => new Date().toString(),
+            difftime: (t2,t1) => t2-t1
+        },
+
+        // Roblox stubs
+        game: new Proxy({}, { get: (_, k) => (...a) => { printLine(`[game.${k}] called`, 'lua-warn'); return {}; } }),
+        workspace: new Proxy({}, { get: (_, k) => (...a) => { printLine(`[workspace.${k}] called`, 'lua-warn'); return {}; } }),
+        script: { Name: 'Script', Parent: null },
+        _G: {},
+        shared: {},
+
+        getfenv: () => ({}),
+        setfenv: () => {},
+        getgenv: () => ({}),
+        newproxy: () => ({}),
+    };
+
+    // Add string as metatable (s:upper() style)
+    String.prototype.__luaIndex = luaEnv.string;
+
+    // Transpile and run
+    let stmtCount = 0;
+    const lines = code.split('\n');
+    const jsLines = [];
+    const varMap = {};
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('--')) {
+            jsLines.push('// ' + trimmed);
+            continue;
+        }
+
+        const js = transpileLuaLine(trimmed, luaEnv, varMap);
+        if (js) jsLines.push(js);
+    }
+
+    // Execute via Function
+    const jsCode = jsLines.join('\n');
+    const fn = new Function(
+        ...Object.keys(luaEnv),
+        '"use strict";\n' + jsCode
+    );
+
+    try {
+        fn(...Object.values(luaEnv));
+        return `${output.length} line(s) of output`;
+    } catch(e) {
+        printLine(`❌ Runtime error: ${e.message}`, 'lua-error');
+        return null;
+    }
+}
+
+function transpileLuaLine(line, env, vars) {
+    // Basic Lua → JS transpilation for common patterns
+    // This handles: print, local var, assignments, for loops, while, if, string methods
+
+    // Comments
+    if (line.startsWith('--')) return '// ' + line.slice(2);
+
+    // print(...)
+    if (/^print\s*\(/.test(line)) return line.replace(/^print/, 'print') + ';';
+
+    // warn(...)
+    if (/^warn\s*\(/.test(line)) return line + ';';
+
+    // local x = ...
+    if (/^local\s+(\w+)\s*=/.test(line)) {
+        return 'var ' + line.replace(/^local\s+/, '') + ';';
+    }
+
+    // local x, y = ...
+    if (/^local\s+\w+,/.test(line)) {
+        return 'var ' + line.replace(/^local\s+/, '') + ';';
+    }
+
+    // for i = a, b do → for(let i=a; i<=b; i++)
+    const forNum = line.match(/^for\s+(\w+)\s*=\s*(.+?),\s*(.+?)(?:,\s*(.+?))?\s+do$/);
+    if (forNum) {
+        const [_, v, a, b, step] = forNum;
+        const s = step || '1';
+        return `for (var ${v}=${a}; ${v}<=${b}; ${v}+=${s}) {`;
+    }
+
+    // while ... do
+    if (/^while\s+.+\s+do$/.test(line)) {
+        return line.replace(/^while\s+/, 'while (').replace(/\s+do$/, ') {');
+    }
+
+    // repeat
+    if (line === 'repeat') return 'do {';
+
+    // until
+    if (/^until\s+/.test(line)) return '} while (!(' + line.slice(6) + '));';
+
+    // if ... then
+    if (/^if\s+.+\s+then$/.test(line)) {
+        return line.replace(/^if\s+/, 'if (').replace(/\s+then$/, ') {')
+            .replace(/\s+and\s+/g,' && ').replace(/\s+or\s+/g,' || ')
+            .replace(/\bnot\s+/g,'!').replace(/~=/g,'!==').replace(/\b==/g,'===');
+    }
+
+    // elseif ... then
+    if (/^elseif\s+.+\s+then$/.test(line)) {
+        return line.replace(/^elseif\s+/, 'else if (').replace(/\s+then$/, ') {')
+            .replace(/\s+and\s+/g,' && ').replace(/\s+or\s+/g,' || ')
+            .replace(/\bnot\s+/g,'!').replace(/~=/g,'!==');
+    }
+
+    if (line === 'else') return '} else {';
+    if (line === 'end') return '}';
+
+    // return
+    if (/^return\s+/.test(line)) return line + ';';
+    if (line === 'return') return 'return;';
+
+    // break
+    if (line === 'break') return 'break;';
+
+    // String concat: .. → +
+    let js = line
+        .replace(/\.\./g, '+')
+        .replace(/\bnot\s+/g, '!')
+        .replace(/\s+and\s+/g, ' && ')
+        .replace(/\s+or\s+/g, ' || ')
+        .replace(/~=/g, '!==')
+        .replace(/#(\w+)/g, '$1.length');
+
+    // string.X(s,...) → string.X(s,...) [already mapped]
+    // s:method() → string.method(s)
+    js = js.replace(/(\w+):(\w+)\s*\(/g, 'string.$2($1, ');
+
+    return js + ';';
+}
+
+function luaToStr(v) {
+    if (v === null || v === undefined) return 'nil';
+    if (typeof v === 'boolean') return v.toString();
+    if (typeof v === 'number') return Number.isInteger(v) ? v.toString() : v.toString();
+    if (typeof v === 'string') return v;
+    if (typeof v === 'function') return 'function: 0x' + Math.floor(Math.random()*0xFFFFFF).toString(16);
+    if (typeof v === 'object') return 'table: 0x' + Math.floor(Math.random()*0xFFFFFF).toString(16);
+    return String(v);
+}
+
+function luaPatternToJS(p) {
+    return p
+        .replace(/([.+*?^${}()|[\]\\])/g, '\\$1')
+        .replace(/\\%a/g,'[a-zA-Z]').replace(/%a/g,'[a-zA-Z]')
+        .replace(/\\%d/g,'[0-9]').replace(/%d/g,'[0-9]')
+        .replace(/\\%l/g,'[a-z]').replace(/%l/g,'[a-z]')
+        .replace(/\\%u/g,'[A-Z]').replace(/%u/g,'[A-Z]')
+        .replace(/\\%s/g,'\\s').replace(/%s/g,'\\s')
+        .replace(/\\%w/g,'[a-zA-Z0-9]').replace(/%w/g,'[a-zA-Z0-9]')
+        .replace(/\\%p/g,'[\\x21-\\x2F\\x3A-\\x40\\x5B-\\x60\\x7B-\\x7E]')
+        .replace(/%p/g,'[\\x21-\\x2F\\x3A-\\x40\\x5B-\\x60\\x7B-\\x7E]')
+        .replace(/\\%c/g,'[\\x00-\\x1F\\x7F]').replace(/%c/g,'[\\x00-\\x1F\\x7F]')
+        .replace(/\\%x/g,'[0-9a-fA-F]').replace(/%x/g,'[0-9a-fA-F]')
+        .replace(/\\\./g,'[\\s\\S]').replace(/\./g,'[\\s\\S]');
+}
+
+// ================================================================
+//  ALPHABET GRID (show on load)
+// ================================================================
+
+function buildAlphaGrid() {
+    const grid = document.getElementById('alphaGrid');
+    const chars = Object.entries(WAD_ALPHA_MAP).filter(([c,v]) => v >= 0 && v < 64);
+    chars.sort((a,b) => a[1]-b[1]);
+
+    for (const [ch, val] of chars) {
+        const cell = document.createElement('div');
+        cell.className = 'alpha-cell';
+        cell.innerHTML = `<div class="alpha-char">${esc(ch)}</div><div class="alpha-val">= ${val}</div>`;
+        grid.appendChild(cell);
+    }
+}
+
+// ================================================================
+//  HELPERS
+// ================================================================
+
+function colorForType(s) {
+    if (!s) return '#666';
+    if (/^[a-zA-Z_][\w.]*$/.test(s)) return '#88aaff';
+    if (/^\d+(\.\d+)?$/.test(s)) return '#ffaa44';
+    if (s.length <= 2) return '#aaa';
+    return '#88ff88';
+}
+
+function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatSize(b) {
+    return b < 1024 ? b+'B' : (b/1024).toFixed(1)+'KB';
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function resetSteps() {
+    for (let i = 1; i <= 5; i++) {
+        document.getElementById(`s${i}`).className = 'step';
+        const t = document.getElementById(`s${i}t`);
+        t.className = 'step-s wait';
+        t.textContent = 'Waiting...';
+    }
+}
+
+function step(n, state, text) {
+    const card = document.getElementById(`s${n}`);
+    const status = document.getElementById(`s${n}t`);
+    const stateMap = { run:'running', done:'done', error:'error' };
+    const clsMap = { run:'run', done:'ok', error:'err' };
+    card.className = `step ${stateMap[state]||''}`;
+    status.className = `step-s ${clsMap[state]||'wait'}`;
+    status.textContent = text;
 }
 
 function showTab(id, btn) {
@@ -1050,243 +1585,53 @@ function showTab(id, btn) {
     btn.classList.add('active');
 }
 
-function escapeHTML(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-function classifyString(str) {
-    if (!str) return { type: 'empty', color: '#666' };
-    if (/^[a-zA-Z_]\w*$/.test(str)) return { type: 'identifier', color: '#88aaff' };
-    if (/^\d+(\.\d+)?$/.test(str)) return { type: 'number', color: '#ffaa44' };
-    if (str.length <= 3) return { type: 'short', color: '#aaa' };
-    if (str.includes('.') && /^[a-zA-Z_][\w.]+$/.test(str)) return { type: 'property', color: '#ff88ff' };
-    return { type: 'string', color: '#88ff88' };
-}
-
-async function decode() {
-    const code = document.getElementById('inputCode').value.trim();
-
-    if (!code) {
-        alert('Please paste an obfuscated script first!');
-        return;
-    }
-
-    // Show steps card
-    document.getElementById('stepsCard').style.display = 'block';
-    document.getElementById('resultsCard').style.display = 'none';
-
-    // Reset steps
-    for (let i = 1; i <= 5; i++) {
-        setStep(i, 'wait', 'Waiting...');
-    }
-
-    await sleep(100);
-
-    // Step 1: Detect
-    setStep(1, 'active', '⏳ Detecting...');
-    await sleep(300);
-    const detection = WADDecoder.detect(code);
-    if (detection.detected) {
-        setStep(1, 'done', `✅ Detected v${detection.version} (score: ${detection.score}/6)`);
-    } else {
-        setStep(1, 'error', `⚠️ Low confidence (score: ${detection.score}/6) — trying anyway`);
-    }
-
-    await sleep(200);
-
-    // Step 2: Extract S Table
-    setStep(2, 'active', '⏳ Extracting...');
-    await sleep(300);
-    const rawStrings = WADDecoder.extractSTable(code);
-    setStep(2, 'done', `✅ Found ${rawStrings.length} strings`);
-
-    await sleep(200);
-
-    // Step 3: Decode decimal escapes
-    setStep(3, 'active', '⏳ Decoding...');
-    await sleep(300);
-    const sampleDecoded = WADDecoder.decodeDecimalEscapes(rawStrings[0] || '');
-    setStep(3, 'done', `✅ Decoded escape sequences`);
-
-    await sleep(200);
-
-    // Step 4: Custom base64
-    setStep(4, 'active', '⏳ Decoding custom encoding...');
-    await sleep(300);
-    const xTable = WADDecoder.extractXTable(code);
-    setStep(4, 'done', xTable
-        ? `✅ X-table extracted (${Object.keys(xTable).length} entries)`
-        : `⚠️ X-table not found, using fallback decoder`
-    );
-
-    await sleep(200);
-
-    // Step 5: Full decode
-    setStep(5, 'active', '⏳ Reconstructing...');
-    await sleep(400);
-    const result = WADDecoder.decode(code);
-    currentResult = result;
-    setStep(5, 'done', `✅ Done — ${result.stats.decoded} strings decoded`);
-
-    await sleep(200);
-
-    // Show results
-    displayResults(result);
-}
-
-function displayResults(result) {
-    document.getElementById('resultsCard').style.display = 'block';
-
-    // Update stats
-    document.getElementById('stat-strings').textContent = result.stats.total;
-    document.getElementById('stat-decoded').textContent = result.stats.decoded;
-    document.getElementById('stat-size').textContent = formatSize(result.analysis.scriptSize);
-    document.getElementById('stat-layer').textContent = '3';
-
-    // String table
-    const tbody = document.getElementById('stringTableBody');
-    tbody.innerHTML = '';
-
-    for (const s of result.decodedStrings) {
-        const cls = classifyString(s.final);
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="idx">${s.index}</td>
-            <td class="raw" title="${escapeHTML(s.raw)}">${escapeHTML(s.afterDecimal.substring(0, 40))}${s.afterDecimal.length > 40 ? '...' : ''}</td>
-            <td class="decoded" style="color:${cls.color}">${escapeHTML(s.final.substring(0, 60))}${s.final.length > 60 ? '...' : ''}</td>
-            <td style="color:#888;font-size:11px;">${cls.type}</td>
-        `;
-        tbody.appendChild(row);
-    }
-
-    // Also add all decimal strings found
-    if (result.allDecimalStrings) {
-        const seen = new Set(result.decodedStrings.map(s => s.final));
-        for (const s of result.allDecimalStrings) {
-            if (!seen.has(s.decoded)) {
-                seen.add(s.decoded);
-                const cls = classifyString(s.decoded);
-                const row = document.createElement('tr');
-                row.style.opacity = '0.7';
-                row.innerHTML = `
-                    <td class="idx">+</td>
-                    <td class="raw" title="${escapeHTML(s.raw)}">${escapeHTML(s.raw.substring(0, 40))}...</td>
-                    <td class="decoded" style="color:${cls.color}">${escapeHTML(s.decoded.substring(0, 60))}</td>
-                    <td style="color:#888;font-size:11px;">inline</td>
-                `;
-                tbody.appendChild(row);
-            }
-        }
-    }
-
-    // Decoded script tab
-    document.getElementById('decodedScript').textContent = result.reconstructed;
-
-    // Raw decoded
-    const rawLines = result.decodedStrings
-        .filter(s => s.final && s.final.trim().length > 0)
-        .map(s => `[${s.index}] ${s.final}`)
-        .join('\n');
-    document.getElementById('rawOutput').textContent = rawLines;
-
-    // Analysis tab
-    const analysis = result.analysis;
-    let analysisHTML = '';
-
-    if (analysis.gameIdentifier) {
-        analysisHTML += `<div class="alert alert-success">
-            🎮 <strong>Target Game Identifier:</strong> "${escapeHTML(analysis.gameIdentifier)}"
-        </div>`;
-    }
-
-    if (analysis.hasLoadstring) {
-        analysisHTML += `<div class="alert alert-warn">
-            ⚠️ <strong>loadstring() detected</strong> — script loads additional code at runtime
-        </div>`;
-    }
-
-    if (analysis.hasHttpGet) {
-        analysisHTML += `<div class="alert alert-warn">
-            🌐 <strong>HTTP request detected</strong> — script may download additional code
-        </div>`;
-    }
-
-    if (analysis.hasRemoteEvents) {
-        analysisHTML += `<div class="alert alert-info">
-            📡 <strong>Remote Events/Functions detected</strong> — script communicates with server
-        </div>`;
-    }
-
-    // APIs found
-    if (analysis.apis.length > 0) {
-        analysisHTML += `
-        <div class="card" style="background:var(--bg2); margin-top:12px;">
-            <div class="card-title">🔍 APIs / Functions Referenced</div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                ${analysis.apis.map(api => `<span class="badge" style="background:rgba(68,136,255,0.1);border-color:rgba(68,136,255,0.3);color:#88aaff;">${escapeHTML(api)}</span>`).join('')}
-            </div>
-        </div>`;
-    }
-
-    // Readable strings
-    if (analysis.readableStrings.length > 0) {
-        analysisHTML += `
-        <div class="card" style="background:var(--bg2); margin-top:12px;">
-            <div class="card-title">🔤 All Decoded Strings</div>
-            <div style="font-family:Courier New;font-size:12px;line-height:2;">
-                ${analysis.readableStrings.map(s =>
-                    `<span style="background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.1);border-radius:4px;padding:2px 8px;margin:2px;display:inline-block;color:#aaffcc;">${escapeHTML(s)}</span>`
-                ).join('')}
-            </div>
-        </div>`;
-    }
-
-    document.getElementById('analysisContent').innerHTML = analysisHTML;
-
-    // Scroll to results
-    document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function copyScript() {
-    const text = document.getElementById('decodedScript').textContent;
+function cpyEl(id, btnId) {
+    const text = document.getElementById(id).textContent;
     navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copyScriptBtn');
-        btn.textContent = '✅ Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            const old = btn.textContent;
+            btn.textContent = '✅ Copied!';
+            btn.classList.add('ok');
+            setTimeout(() => { btn.textContent = old; btn.classList.remove('ok'); }, 2000);
+        }
     });
 }
 
-function copyRaw() {
-    const text = document.getElementById('rawOutput').textContent;
-    navigator.clipboard.writeText(text);
+function cpyLuaOut() {
+    const lines = [...document.getElementById('luaOut').querySelectorAll('.lua-line')]
+        .map(l => l.textContent).join('\n');
+    navigator.clipboard.writeText(lines);
+}
+
+function clearLuaOut() {
+    document.getElementById('luaOut').innerHTML =
+        '<div class="lua-line lua-info">-- Output cleared --</div>';
+}
+
+function clearLua() {
+    document.getElementById('luaInput').value = '';
 }
 
 function clearAll() {
     document.getElementById('inputCode').value = '';
     document.getElementById('stepsCard').style.display = 'none';
     document.getElementById('resultsCard').style.display = 'none';
-    currentResult = null;
-}
-
-function formatSize(bytes) {
-    if (bytes < 1024) return bytes + 'B';
-    return (bytes / 1024).toFixed(1) + 'KB';
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    lastResult = null;
 }
 
 function loadSample() {
-    document.getElementById('inputCode').value = `--[[ v1.0.0 https://wearedevs.net/obfuscator ]] return(function(...)local S={"\\068\\090\\107\\082\\109\\057\\119\\082\\103\\083\\102\\073\\109\\097\\049\\108";"\\118\\087\\108\\076\\109\\079\\113\\061","","\\106\\051\\049\\102\\118\\051\\106\\074\\066\\083\\088\\085\\052\\051\\106\\120\\052\\051\\106\\070\\066\\113\\061\\061","\\106\\051\\105\\055\\052\\051\\049\\119\\109\\051\\085\\099";"\\082\\119\\107\\079\\080\\105\\061\\061"}for V,t in ipairs({{485089+-485088,510848+-510803}})do while t[1]<t[2]do S[t[1]],S[t[2]],t[1],t[2]=S[t[2]],S[t[1]],t[1]+1,t[2]-1 end end local function V(V)return S[V+(862473+-814219)]end return "decoded"end)(...)`;
+    // Load the actual script from your paste
+    document.getElementById('inputCode').value = `--[[ v1.0.0 https://wearedevs.net/obfuscator ]] return(function(...)local S={"\\068\\090\\107\\082\\109\\057\\119\\082\\103\\083\\102\\073\\109\\097\\049\\108";"\\118\\087\\108\\076\\109\\079\\113\\061","","\\106\\051\\049\\102\\118\\051\\106\\074\\066\\083\\088\\085\\052\\051\\106\\120\\052\\051\\106\\070\\066\\113\\061\\061","\\106\\051\\105\\055\\052\\051\\049\\119\\109\\051\\085\\099";"\\082\\119\\107\\079\\080\\105\\061\\061";"\\067\\090\\050\\086\\106\\070\\070\\090\\065\\070\\052\\102\\067\\079\\076\\104\\057\\106\\053\\061","\\065\\049\\089\\069\\099\\090\\076\\078\\106\\057\\085\\066\\075\\065\\085\\079\\052\\047\\084\\061","\\082\\119\\107\\102\\067\\082\\088\\050\\052\\051\\049\\078\\109\\051\\057\\061";"\\052\\051\\107\\112\\052\\065\\119\\078\\067\\082\\066\\061","\\043\\065\\111\\066\\052\\114\\119\\073\\113\\119\\113\\074\\068\\097\\089\\047\\088\\048\\084\\061";"\\080\\079\\085\\114\\067\\113\\061\\061","\\080\\090\\050\\050\\118\\053\\061\\061";"\\065\\051\\102\\079\\118\\047\\106\\122\\118\\114\\076\\050\\113\\065\\102\\077";"\\067\\082\\108\\074\\109\\097\\066\\061","\\067\\090\\119\\050\\052\\051\\099\\101","\\121\\047\\114\\061"}end)(...)`;
+    runDecode();
 }
-</script>
 
+// ================================================================
+//  ON LOAD
+// ================================================================
+window.addEventListener('load', () => {
+    buildAlphaGrid();
+});
+</script>
 </body>
 </html>
