@@ -3,19 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔓 Universal Decoder</title>
+    <title>🔓 WeAreDevs Obfuscator Decoder</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --green: #00ff88;
             --blue: #4488ff;
             --red: #ff4444;
             --yellow: #ffaa00;
+            --purple: #aa44ff;
             --bg: #0a0a0f;
             --bg2: #111118;
             --bg3: #1a1a2e;
@@ -32,58 +29,39 @@
             padding: 20px;
         }
 
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg2); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #444; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1000px; margin: 0 auto; }
 
-        /* HEADER */
         .header {
             text-align: center;
             padding: 40px 0 30px;
         }
 
         .header h1 {
-            font-size: 3em;
+            font-size: 2.5em;
             background: linear-gradient(135deg, var(--green), var(--blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
+            margin-bottom: 8px;
         }
 
-        .header p {
-            color: var(--muted);
-            font-size: 15px;
-            letter-spacing: 1px;
-        }
+        .header p { color: var(--muted); font-size: 14px; }
 
-        .header .badges {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-
-        .badge {
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            color: #aaa;
+        .version-badge {
+            display: inline-block;
+            background: rgba(0,255,136,0.1);
+            border: 1px solid rgba(0,255,136,0.3);
+            color: var(--green);
             padding: 4px 12px;
             border-radius: 999px;
-            font-size: 11px;
-            letter-spacing: 0.5px;
+            font-size: 12px;
+            margin-top: 8px;
         }
 
-        /* CARD */
         .card {
             background: var(--bg3);
             border: 1px solid var(--border);
@@ -93,7 +71,7 @@
         }
 
         .card-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             color: var(--muted);
             text-transform: uppercase;
@@ -111,42 +89,39 @@
             background: var(--border);
         }
 
-        /* TEXTAREA */
-        .input-wrap {
-            position: relative;
-        }
-
         textarea {
             width: 100%;
-            height: 150px;
+            height: 200px;
             background: var(--bg2);
             border: 2px solid var(--border);
             border-radius: 10px;
             color: #fff;
             padding: 16px;
-            font-size: 14px;
+            font-size: 12px;
             font-family: 'Courier New', monospace;
             resize: vertical;
             outline: none;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            transition: border-color 0.3s;
             line-height: 1.5;
         }
 
-        textarea:focus {
-            border-color: var(--green);
-            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+        textarea:focus { border-color: var(--green); }
+
+        .output-area {
+            width: 100%;
+            min-height: 120px;
+            background: #080810;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            padding: 16px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.6;
         }
 
-        .char-count {
-            position: absolute;
-            bottom: 10px;
-            right: 14px;
-            font-size: 11px;
-            color: var(--muted);
-            pointer-events: none;
-        }
-
-        /* CONTROLS */
         .controls {
             display: flex;
             gap: 10px;
@@ -156,14 +131,13 @@
         }
 
         .btn {
-            padding: 11px 28px;
+            padding: 11px 24px;
             border: none;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
-            letter-spacing: 0.5px;
         }
 
         .btn:active { transform: scale(0.97); }
@@ -174,7 +148,17 @@
         }
 
         .btn-primary:hover {
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.35);
+            box-shadow: 0 4px 20px rgba(0,255,136,0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--blue), #2266cc);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 4px 20px rgba(68,136,255,0.35);
             transform: translateY(-1px);
         }
 
@@ -184,224 +168,193 @@
         }
 
         .btn-danger:hover {
-            box-shadow: 0 4px 20px rgba(255, 68, 68, 0.35);
+            box-shadow: 0 4px 20px rgba(255,68,68,0.35);
             transform: translateY(-1px);
         }
 
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 12px;
-            background: var(--bg2);
-            color: #aaa;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-        }
-
-        .btn-sm:hover {
-            background: var(--border);
+        .btn-purple {
+            background: linear-gradient(135deg, var(--purple), #7722cc);
             color: #fff;
         }
 
-        .filter-select {
-            padding: 10px 14px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 13px;
-            outline: none;
-            cursor: pointer;
-            margin-left: auto;
-        }
-
-        .filter-select:focus {
-            border-color: var(--blue);
-        }
-
-        /* EXAMPLES */
-        .examples-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .ex-btn {
-            padding: 6px 14px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #aaa;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .ex-btn:hover {
-            background: var(--border);
-            color: var(--green);
-            border-color: var(--green);
+        .btn-purple:hover {
+            box-shadow: 0 4px 20px rgba(170,68,255,0.35);
             transform: translateY(-1px);
         }
 
-        /* TAGS */
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .tag {
-            padding: 4px 10px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 11px;
-            color: #888;
-        }
-
-        /* RESULTS */
-        #results { min-height: 80px; }
-
-        .results-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        /* STEPS DISPLAY */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
             margin-bottom: 16px;
         }
 
-        .results-title {
-            color: var(--green);
-            font-size: 16px;
-            font-weight: bold;
+        .step-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            transition: all 0.3s;
         }
 
-        .results-count {
-            background: var(--green);
-            color: #000;
-            padding: 2px 10px;
-            border-radius: 999px;
+        .step-card.active {
+            border-color: var(--green);
+            box-shadow: 0 0 15px rgba(0,255,136,0.1);
+        }
+
+        .step-card.done {
+            border-color: var(--blue);
+            background: rgba(68,136,255,0.05);
+        }
+
+        .step-card.error {
+            border-color: var(--red);
+            background: rgba(255,68,68,0.05);
+        }
+
+        .step-num {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .step-name {
+            font-weight: bold;
+            font-size: 13px;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .step-status {
             font-size: 12px;
-            font-weight: bold;
-        }
-
-        .placeholder {
-            text-align: center;
-            padding: 50px 20px;
             color: var(--muted);
         }
 
-        .placeholder .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
+        .step-status.ok { color: var(--green); }
+        .step-status.err { color: var(--red); }
+        .step-status.running { color: var(--yellow); }
+
+        /* STRING TABLE */
+        .string-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
         }
 
-        .placeholder p {
-            font-size: 15px;
+        .string-table th {
+            background: var(--bg2);
+            color: var(--muted);
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-weight: normal;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        /* HASH WARNING */
-        .hash-alert {
-            background: rgba(255, 170, 0, 0.08);
-            border: 1px solid rgba(255, 170, 0, 0.3);
-            border-left: 4px solid var(--yellow);
-            padding: 16px;
+        .string-table td {
+            padding: 6px 12px;
+            border-bottom: 1px solid rgba(42,42,62,0.5);
+            vertical-align: top;
+        }
+
+        .string-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .idx { color: var(--yellow); width: 40px; }
+        .raw { color: #888; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .decoded { color: var(--green); max-width: 300px; word-break: break-all; }
+
+        .table-wrap {
+            max-height: 350px;
+            overflow-y: auto;
             border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 4px;
             margin-bottom: 16px;
+            background: var(--bg2);
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 9px;
+            background: none;
+            border: none;
+            border-radius: 7px;
+            color: var(--muted);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: var(--bg3);
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ALERT */
+        .alert {
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            font-size: 13px;
+        }
+
+        .alert-info {
+            background: rgba(68,136,255,0.08);
+            border: 1px solid rgba(68,136,255,0.2);
+            color: #88aaff;
+        }
+
+        .alert-warn {
+            background: rgba(255,170,0,0.08);
+            border: 1px solid rgba(255,170,0,0.2);
             color: #ffcc66;
         }
 
-        .hash-alert strong {
-            display: block;
-            margin-bottom: 4px;
-            font-size: 14px;
+        .alert-success {
+            background: rgba(0,255,136,0.08);
+            border: 1px solid rgba(0,255,136,0.2);
+            color: var(--green);
         }
 
-        .hash-alert small {
-            color: #cc9944;
-            font-size: 12px;
+        .alert-error {
+            background: rgba(255,68,68,0.08);
+            border: 1px solid rgba(255,68,68,0.2);
+            color: #ff8888;
         }
 
-        /* RESULT ITEM */
-        .result-item {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--green);
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 10px;
-            transition: all 0.2s;
-            position: relative;
+        /* SPINNER */
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0,255,136,0.2);
+            border-top: 2px solid var(--green);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
         }
 
-        .result-item:hover {
-            transform: translateX(4px);
-            border-color: var(--green);
-            box-shadow: 0 2px 20px rgba(0, 255, 136, 0.08);
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .result-item.cipher {
-            border-left-color: var(--blue);
-        }
-
-        .result-item.cipher:hover {
-            border-color: var(--blue);
-            box-shadow: 0 2px 20px rgba(68, 136, 255, 0.08);
-        }
-
-        .result-item.web {
-            border-left-color: var(--yellow);
-        }
-
-        .result-item.binary {
-            border-left-color: #aa44ff;
-        }
-
-        .result-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .result-method {
-            font-weight: bold;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .method-encoding { color: var(--green); }
-        .method-cipher { color: var(--blue); }
-        .method-binary { color: #aa44ff; }
-        .method-web { color: var(--yellow); }
-
-        .method-badge {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: normal;
-        }
-
-        .badge-encoding { background: rgba(0,255,136,0.1); color: var(--green); }
-        .badge-cipher { background: rgba(68,136,255,0.1); color: var(--blue); }
-        .badge-binary { background: rgba(170,68,255,0.1); color: #aa44ff; }
-        .badge-web { background: rgba(255,170,0,0.1); color: var(--yellow); }
-
-        .result-text {
-            background: #080810;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 12px 14px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            color: #fff;
-            word-break: break-all;
-            white-space: pre-wrap;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
+        /* COPY BTN */
         .copy-btn {
             padding: 5px 14px;
             background: var(--bg3);
@@ -411,66 +364,47 @@
             font-size: 11px;
             cursor: pointer;
             transition: all 0.2s;
-            white-space: nowrap;
+            float: right;
         }
 
-        .copy-btn:hover {
-            background: var(--border);
-            color: #fff;
+        .copy-btn:hover { background: var(--border); color: #fff; }
+        .copy-btn.copied { background: rgba(0,255,136,0.1); border-color: var(--green); color: var(--green); }
+
+        /* INFO GRID */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
-        .copy-btn.copied {
-            background: rgba(0,255,136,0.1);
-            border-color: var(--green);
-            color: var(--green);
-        }
-
-        /* LOADING */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--green);
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 36px;
-            height: 36px;
-            border: 3px solid rgba(0,255,136,0.1);
-            border-top: 3px solid var(--green);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin-bottom: 12px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* NO RESULTS */
-        .no-result {
-            text-align: center;
-            padding: 40px;
-            color: var(--muted);
-        }
-
-        /* KEYBOARD HINT */
-        .kbd-hint {
-            font-size: 11px;
-            color: var(--muted);
-            margin-left: auto;
-        }
-
-        kbd {
+        .info-item {
             background: var(--bg2);
             border: 1px solid var(--border);
-            border-radius: 3px;
-            padding: 1px 5px;
-            font-size: 10px;
-            color: #aaa;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
         }
 
-        /* FOOTER */
+        .info-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--green);
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* HIGHLIGHT */
+        .hl-keyword { color: #cc88ff; }
+        .hl-string { color: #88ff88; }
+        .hl-number { color: #ffaa44; }
+        .hl-comment { color: #666; font-style: italic; }
+        .hl-function { color: #44aaff; }
+
         .footer {
             text-align: center;
             padding: 30px 0;
@@ -478,11 +412,10 @@
             font-size: 12px;
         }
 
-        /* RESPONSIVE */
         @media (max-width: 600px) {
-            .header h1 { font-size: 2em; }
+            .header h1 { font-size: 1.8em; }
+            .steps { grid-template-columns: 1fr; }
             .controls { flex-direction: column; }
-            .filter-select { margin-left: 0; width: 100%; }
             .btn { width: 100%; text-align: center; }
         }
     </style>
@@ -493,701 +426,865 @@
 
     <!-- HEADER -->
     <div class="header">
-        <h1>🔓 Universal Decoder</h1>
-        <p>Decode • Decrypt • Identify — All in One Place</p>
-        <div class="badges">
-            <span class="badge">Base64</span>
-            <span class="badge">Hex</span>
-            <span class="badge">Binary</span>
-            <span class="badge">Morse</span>
-            <span class="badge">ROT1–25</span>
-            <span class="badge">Atbash</span>
-            <span class="badge">URL</span>
-            <span class="badge">HTML</span>
-            <span class="badge">JWT</span>
-            <span class="badge">XOR</span>
-            <span class="badge">Vigenère</span>
-            <span class="badge">Hash ID</span>
+        <h1>🔓 WeAreDevs Decoder</h1>
+        <p>Decode obfuscated Lua scripts from wearedevs.net/obfuscator</p>
+        <div>
+            <span class="version-badge">v1.0.0 Compatible</span>
         </div>
     </div>
 
-    <!-- SUPPORTED -->
+    <!-- INFO ABOUT THE OBFUSCATION -->
     <div class="card">
-        <div class="card-title">🧩 All Supported Formats</div>
-        <div class="tags">
-            <span class="tag">Base64</span>
-            <span class="tag">Base32</span>
-            <span class="tag">Hexadecimal</span>
-            <span class="tag">Binary (8-bit)</span>
-            <span class="tag">Octal</span>
-            <span class="tag">Decimal ASCII</span>
-            <span class="tag">URL Encoding</span>
-            <span class="tag">HTML Entities</span>
-            <span class="tag">Unicode Escape</span>
-            <span class="tag">ROT1 → ROT25</span>
-            <span class="tag">ROT13</span>
-            <span class="tag">Atbash Cipher</span>
-            <span class="tag">Morse Code</span>
-            <span class="tag">Rail Fence 2–5</span>
-            <span class="tag">Bacon Cipher</span>
-            <span class="tag">Vigenère Cipher</span>
-            <span class="tag">XOR Brute Force</span>
-            <span class="tag">JWT Decode</span>
-            <span class="tag">Reverse String</span>
-            <span class="tag">MD5 Hash ID</span>
-            <span class="tag">SHA-1 Hash ID</span>
-            <span class="tag">SHA-256 Hash ID</span>
-            <span class="tag">SHA-512 Hash ID</span>
-            <span class="tag">Bcrypt Hash ID</span>
-            <span class="tag">Argon2 Hash ID</span>
+        <div class="card-title">ℹ️ How This Obfuscator Works</div>
+        <div class="alert alert-info">
+            <strong>Layer 1 — Decimal Escape Sequences:</strong><br>
+            All strings are encoded as <code>\068\090\107...</code> (Lua decimal escapes → ASCII chars)
         </div>
-    </div>
-
-    <!-- EXAMPLES -->
-    <div class="card">
-        <div class="card-title">⚡ Quick Examples</div>
-        <div class="examples-grid">
-            <button class="ex-btn" onclick="tryEx('SGVsbG8gV29ybGQh')">📦 Base64</button>
-            <button class="ex-btn" onclick="tryEx('48656c6c6f20576f726c6421')">🔢 Hex</button>
-            <button class="ex-btn" onclick="tryEx('01001000 01100101 01101100 01101100 01101111')">💾 Binary</button>
-            <button class="ex-btn" onclick="tryEx('Uryyb Jbeyq!')">🔄 ROT13</button>
-            <button class="ex-btn" onclick="tryEx('.... . .-.. .-.. --- / .-- --- .-. .-.. -..')">📡 Morse</button>
-            <button class="ex-btn" onclick="tryEx('Hello%20World%21')">🌐 URL</button>
-            <button class="ex-btn" onclick="tryEx('JBSWY3DPEBLW64TMMQ======')">🔡 Base32</button>
-            <button class="ex-btn" onclick="tryEx('5d41402abc4b2a76b9719d911017c592')">🔐 MD5 Hash</button>
-            <button class="ex-btn" onclick="tryEx('\\u0048\\u0065\\u006C\\u006C\\u006F')">🔣 Unicode</button>
-            <button class="ex-btn" onclick="tryEx('&lt;b&gt;Hello&lt;/b&gt;')">🏷️ HTML</button>
-            <button class="ex-btn" onclick="tryEx('104 101 108 108 111')">🔢 Decimal</button>
-            <button class="ex-btn" onclick="tryEx('150 145 154 154 157')">8️⃣ Octal</button>
-            <button class="ex-btn" onclick="tryEx('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c')">🎫 JWT</button>
+        <div class="alert alert-info">
+            <strong>Layer 2 — Custom Base64 Alphabet:</strong><br>
+            Strings in the <code>S</code> table are encoded with a shuffled Base64-like encoding using a custom character set
+        </div>
+        <div class="alert alert-warn">
+            <strong>Layer 3 — Bytecode VM:</strong><br>
+            The script runs on a custom Lua virtual machine with its own instruction set.
+            Full decompilation requires executing the bytecode. This decoder extracts all readable strings and decodes all static layers.
         </div>
     </div>
 
     <!-- INPUT -->
     <div class="card">
-        <div class="card-title">📥 Input</div>
-        <div class="input-wrap">
-            <textarea
-                id="inputText"
-                placeholder="Paste your encoded text, hash, or cipher here...&#10;&#10;Supports: Base64, Hex, Binary, Morse, ROT13, URL, HTML, JWT, XOR and more..."
-                oninput="updateCount()"
-                onkeydown="handleKey(event)"
-            ></textarea>
-            <span class="char-count" id="charCount">0 chars</span>
-        </div>
+        <div class="card-title">📥 Input — Paste Obfuscated Lua Script</div>
+        <textarea id="inputCode" placeholder='Paste your WeAreDevs obfuscated Lua script here...
+-- Example:
+--[[ v1.0.0 https://wearedevs.net/obfuscator ]] return(function(...)local S={"\068\090\107...
+'></textarea>
 
         <div class="controls">
-            <button class="btn btn-primary" onclick="runDecode()">⚡ Decode All</button>
+            <button class="btn btn-primary" onclick="decode()">⚡ Decode Script</button>
+            <button class="btn btn-secondary" onclick="loadSample()">📋 Load Sample</button>
             <button class="btn btn-danger" onclick="clearAll()">🗑 Clear</button>
-
-            <select class="filter-select" id="filterSelect">
-                <option value="all">🔍 All Methods</option>
-                <option value="encoding">📦 Encodings Only</option>
-                <option value="cipher">🔐 Ciphers Only</option>
-                <option value="binary">💾 Binary Formats</option>
-                <option value="web">🌐 Web Formats</option>
-            </select>
-
-            <span class="kbd-hint">
-                <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to decode
-            </span>
         </div>
     </div>
 
-    <!-- RESULTS -->
-    <div class="card" id="resultsCard">
-        <div id="results">
-            <div class="placeholder">
-                <div class="icon">🔒</div>
-                <p>Enter encoded text above and click <strong>Decode All</strong></p>
+    <!-- DECODE STEPS -->
+    <div class="card" id="stepsCard" style="display:none;">
+        <div class="card-title">🔄 Decode Progress</div>
+        <div class="steps">
+            <div class="step-card" id="step1">
+                <div class="step-num">Step 1</div>
+                <div class="step-name">Detect Obfuscator</div>
+                <div class="step-status" id="step1-status">Waiting...</div>
+            </div>
+            <div class="step-card" id="step2">
+                <div class="step-num">Step 2</div>
+                <div class="step-name">Extract S Table</div>
+                <div class="step-status" id="step2-status">Waiting...</div>
+            </div>
+            <div class="step-card" id="step3">
+                <div class="step-num">Step 3</div>
+                <div class="step-name">Decode Decimal Escapes</div>
+                <div class="step-status" id="step3-status">Waiting...</div>
+            </div>
+            <div class="step-card" id="step4">
+                <div class="step-num">Step 4</div>
+                <div class="step-name">Decode Custom Base64</div>
+                <div class="step-status" id="step4-status">Waiting...</div>
+            </div>
+            <div class="step-card" id="step5">
+                <div class="step-num">Step 5</div>
+                <div class="step-name">Reconstruct Script</div>
+                <div class="step-status" id="step5-status">Waiting...</div>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER -->
-    <div class="footer">
-        Universal Decoder &nbsp;•&nbsp; All processing done locally in your browser &nbsp;•&nbsp; No data sent to server
+    <!-- RESULTS TABS -->
+    <div class="card" id="resultsCard" style="display:none;">
+        <div class="card-title">📊 Decode Results</div>
+
+        <!-- INFO GRID -->
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-value" id="stat-strings">0</div>
+                <div class="info-label">Strings Found</div>
+            </div>
+            <div class="info-item">
+                <div class="info-value" id="stat-decoded">0</div>
+                <div class="info-label">Strings Decoded</div>
+            </div>
+            <div class="info-item">
+                <div class="info-value" id="stat-size">0</div>
+                <div class="info-label">Script Size</div>
+            </div>
+            <div class="info-item">
+                <div class="info-value" id="stat-layer">3</div>
+                <div class="info-label">Layers Detected</div>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('tab-strings', this)">🔤 String Table</button>
+            <button class="tab" onclick="showTab('tab-script', this)">📜 Decoded Script</button>
+            <button class="tab" onclick="showTab('tab-analysis', this)">🔬 Analysis</button>
+            <button class="tab" onclick="showTab('tab-raw', this)">📄 Raw Decoded</button>
+        </div>
+
+        <!-- STRING TABLE TAB -->
+        <div class="tab-content active" id="tab-strings">
+            <div class="table-wrap">
+                <table class="string-table">
+                    <thead>
+                        <tr>
+                            <th class="idx">#</th>
+                            <th>Raw (after decimal decode)</th>
+                            <th>Final Decoded String</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stringTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DECODED SCRIPT TAB -->
+        <div class="tab-content" id="tab-script">
+            <div style="position:relative;">
+                <button class="copy-btn" id="copyScriptBtn" onclick="copyScript()">📋 Copy</button>
+                <div class="output-area" id="decodedScript" style="min-height:300px;"></div>
+            </div>
+        </div>
+
+        <!-- ANALYSIS TAB -->
+        <div class="tab-content" id="tab-analysis">
+            <div id="analysisContent"></div>
+        </div>
+
+        <!-- RAW DECODED TAB -->
+        <div class="tab-content" id="tab-raw">
+            <div style="position:relative;">
+                <button class="copy-btn" onclick="copyRaw()">📋 Copy</button>
+                <div class="output-area" id="rawOutput" style="min-height:200px;"></div>
+            </div>
+        </div>
     </div>
 
+    <div class="footer">
+        WeAreDevs Obfuscator Decoder &nbsp;•&nbsp; All processing in browser &nbsp;•&nbsp; No data sent anywhere
+    </div>
 </div>
 
 <script>
 // ============================================================
-//  UNIVERSAL DECODER ENGINE
+//  WEAREDEVS OBFUSCATOR v1.0.0 DECODER ENGINE
 // ============================================================
 
-class Decoder {
+const WADDecoder = {
 
-    // ── BASE64 ──────────────────────────────────────────────
-    base64(input) {
-        try {
-            const t = input.trim();
-            if (!/^[A-Za-z0-9+/]+=*$/.test(t) || t.length < 4) return null;
-            const decoded = atob(t);
-            let ok = 0;
-            for (let i = 0; i < decoded.length; i++) {
-                const c = decoded.charCodeAt(i);
-                if ((c >= 32 && c <= 126) || c === 9 || c === 10 || c === 13) ok++;
-            }
-            if (ok / decoded.length < 0.7) return null;
-            return { method: "Base64", category: "encoding", result: decoded };
-        } catch { return null; }
-    }
-
-    // ── BASE32 ──────────────────────────────────────────────
-    base32(input) {
-        try {
-            const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-            const clean = input.toUpperCase().replace(/=+$/, "").trim();
-            if (clean.length < 4 || !/^[A-Z2-7]+$/.test(clean)) return null;
-
-            let bits = "";
-            for (const c of clean) {
-                const v = alpha.indexOf(c);
-                if (v === -1) return null;
-                bits += v.toString(2).padStart(5, "0");
-            }
-
-            let result = "";
-            for (let i = 0; i + 8 <= bits.length; i += 8)
-                result += String.fromCharCode(parseInt(bits.substr(i, 8), 2));
-
-            return { method: "Base32", category: "encoding", result };
-        } catch { return null; }
-    }
-
-    // ── HEXADECIMAL ─────────────────────────────────────────
-    hex(input) {
-        try {
-            const clean = input.replace(/\s+/g, "").replace(/0x/gi, "").replace(/,/g, "");
-            if (!/^[0-9a-fA-F]+$/.test(clean)) return null;
-            if (clean.length % 2 !== 0 || clean.length < 2) return null;
-
-            let result = "";
-            for (let i = 0; i < clean.length; i += 2)
-                result += String.fromCharCode(parseInt(clean.substr(i, 2), 16));
-
-            let ok = 0;
-            for (let i = 0; i < result.length; i++) {
-                const c = result.charCodeAt(i);
-                if ((c >= 32 && c <= 126) || c === 10 || c === 13) ok++;
-            }
-            if (ok / result.length < 0.7) return null;
-
-            return { method: "Hexadecimal", category: "encoding", result };
-        } catch { return null; }
-    }
-
-    // ── BINARY ──────────────────────────────────────────────
-    binary(input) {
-        try {
-            const clean = input.replace(/\s+/g, "");
-            if (!/^[01]+$/.test(clean) || clean.length % 8 !== 0 || clean.length < 8) return null;
-
-            let result = "";
-            for (let i = 0; i < clean.length; i += 8)
-                result += String.fromCharCode(parseInt(clean.substr(i, 8), 2));
-
-            return { method: "Binary (8-bit)", category: "binary", result };
-        } catch { return null; }
-    }
-
-    // ── OCTAL ───────────────────────────────────────────────
-    octal(input) {
-        try {
-            const parts = input.trim().split(/\s+/);
-            if (parts.length < 2) return null;
-
-            let result = "";
-            for (const p of parts) {
-                if (!/^[0-7]+$/.test(p)) return null;
-                const c = parseInt(p, 8);
-                if (c > 127) return null;
-                result += String.fromCharCode(c);
-            }
-
-            return { method: "Octal", category: "binary", result };
-        } catch { return null; }
-    }
-
-    // ── DECIMAL ASCII ───────────────────────────────────────
-    decimal(input) {
-        try {
-            const parts = input.trim().split(/[\s,]+/);
-            if (parts.length < 2) return null;
-
-            let result = "";
-            for (const p of parts) {
-                if (!/^\d+$/.test(p)) return null;
-                const n = parseInt(p, 10);
-                if (n < 0 || n > 127) return null;
-                result += String.fromCharCode(n);
-            }
-
-            return { method: "Decimal ASCII", category: "binary", result };
-        } catch { return null; }
-    }
-
-    // ── URL ENCODING ────────────────────────────────────────
-    url(input) {
-        try {
-            if (!input.includes("%")) return null;
-            const decoded = decodeURIComponent(input);
-            if (decoded === input) return null;
-            return { method: "URL Encoding", category: "web", result: decoded };
-        } catch { return null; }
-    }
-
-    // ── HTML ENTITIES ───────────────────────────────────────
-    html(input) {
-        try {
-            if (!input.includes("&") || !input.includes(";")) return null;
-
-            const map = {
-                "&amp;":"&","&lt;":"<","&gt;":">","&quot;":'"',"&apos;":"'",
-                "&nbsp;":" ","&copy;":"©","&reg;":"®","&trade;":"™","&euro;":"€",
-                "&pound;":"£","&yen;":"¥","&cent;":"¢","&deg;":"°","&plusmn;":"±",
-                "&times;":"×","&divide;":"÷","&bull;":"•","&hellip;":"…",
-                "&laquo;":"«","&raquo;":"»","&larr;":"←","&rarr;":"→",
-                "&hearts;":"♥","&diams;":"♦","&clubs;":"♣","&spades;":"♠"
-            };
-
-            let result = input;
-            for (const [k, v] of Object.entries(map))
-                result = result.split(k).join(v);
-
-            result = result.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n));
-            result = result.replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCharCode(parseInt(h,16)));
-
-            if (result === input) return null;
-            return { method: "HTML Entities", category: "web", result };
-        } catch { return null; }
-    }
-
-    // ── UNICODE ESCAPE ──────────────────────────────────────
-    unicode(input) {
-        try {
-            if (!input.includes("\\u")) return null;
-            const result = input.replace(/\\u([0-9a-fA-F]{4})/g, (_, h) =>
-                String.fromCharCode(parseInt(h, 16))
-            );
-            if (result === input) return null;
-            return { method: "Unicode Escape", category: "web", result };
-        } catch { return null; }
-    }
-
-    // ── JWT ─────────────────────────────────────────────────
-    jwt(input) {
-        try {
-            const parts = input.trim().split(".");
-            if (parts.length !== 3) return null;
-
-            const pad = s => s + "=".repeat((4 - s.length % 4) % 4);
-            const header = JSON.parse(atob(pad(parts[0].replace(/-/g,"+").replace(/_/g,"/"))));
-            const payload = JSON.parse(atob(pad(parts[1].replace(/-/g,"+").replace(/_/g,"/"))));
-
-            return {
-                method: "JWT Token",
-                category: "encoding",
-                result: JSON.stringify({ header, payload }, null, 2)
-            };
-        } catch { return null; }
-    }
-
-    // ── ROT13 ───────────────────────────────────────────────
-    rot13(input) {
-        if (!/[a-zA-Z]/.test(input)) return null;
-        const result = input.replace(/[a-zA-Z]/g, c => {
-            const b = c <= "Z" ? 65 : 97;
-            return String.fromCharCode(((c.charCodeAt(0) - b + 13) % 26) + b);
-        });
-        if (result === input) return null;
-        return { method: "ROT13", category: "cipher", result };
-    }
-
-    // ── CAESAR / ALL ROT ────────────────────────────────────
-    allROT(input) {
-        if (!/[a-zA-Z]/.test(input)) return [];
-        const results = [];
-        for (let shift = 1; shift <= 25; shift++) {
-            if (shift === 13) continue;
-            const result = input.replace(/[a-zA-Z]/g, c => {
-                const b = c <= "Z" ? 65 : 97;
-                return String.fromCharCode(((c.charCodeAt(0) - b + shift) % 26) + b);
-            });
-            if (result !== input)
-                results.push({ method: `ROT${shift} / Caesar +${shift}`, category: "cipher", result });
+    // ── STEP 1: DETECT ───────────────────────────────────────
+    detect(code) {
+        const markers = [
+            "wearedevs.net/obfuscator",
+            "local S={",
+            "\\068\\090",
+            "ipairs(",
+            "string.char",
+            "math.floor"
+        ];
+        let score = 0;
+        for (const m of markers) {
+            if (code.includes(m)) score++;
         }
-        return results;
-    }
+        return {
+            detected: score >= 3,
+            score,
+            version: code.includes("v1.0.0") ? "1.0.0" : "unknown"
+        };
+    },
 
-    // ── ATBASH ──────────────────────────────────────────────
-    atbash(input) {
-        if (!/[a-zA-Z]/.test(input)) return null;
-        const result = input.replace(/[a-zA-Z]/g, c => {
-            if (c >= "a" && c <= "z") return String.fromCharCode(219 - c.charCodeAt(0));
-            if (c >= "A" && c <= "Z") return String.fromCharCode(155 - c.charCodeAt(0));
-            return c;
+    // ── STEP 2: EXTRACT S TABLE ──────────────────────────────
+    extractSTable(code) {
+        const strings = [];
+
+        // Match the S table: local S={...}
+        // Strings are enclosed in double quotes with decimal escapes OR plain strings
+        const sTableMatch = code.match(/local\s+S\s*=\s*\{([\s\S]*?)\}for\s+V/);
+        if (!sTableMatch) {
+            // Try alternative pattern
+            const alt = code.match(/local\s+S\s*=\s*\{([\s\S]*?)\}/);
+            if (!alt) return strings;
+        }
+
+        const tableContent = sTableMatch ? sTableMatch[1] : "";
+
+        // Extract all quoted strings (including decimal escapes)
+        const strPattern = /"((?:[^"\\]|\\.)*)"/g;
+        let match;
+        while ((match = strPattern.exec(code)) !== null) {
+            // Only strings from early part of code (S table)
+            if (match.index > 5000) break;
+            strings.push(match[1]);
+        }
+
+        return strings;
+    },
+
+    // ── STEP 3: DECODE DECIMAL ESCAPES ──────────────────────
+    decodeDecimalEscapes(str) {
+        // Replace \DDD (decimal escape sequences) with actual characters
+        return str.replace(/\\(\d{1,3})/g, (_, num) => {
+            const code = parseInt(num, 10);
+            if (code >= 0 && code <= 127) {
+                return String.fromCharCode(code);
+            }
+            return _;
         });
-        if (result === input) return null;
-        return { method: "Atbash Cipher", category: "cipher", result };
-    }
+    },
 
-    // ── REVERSE ─────────────────────────────────────────────
-    reverse(input) {
-        const result = input.split("").reverse().join("");
-        if (result === input) return null;
-        return { method: "Reversed String", category: "cipher", result };
-    }
+    // ── STEP 4: DECODE CUSTOM BASE64 ─────────────────────────
+    // WeAreDevs uses a custom base64 alphabet with lookup table
+    // The x table in the script maps chars to values (base-64 system)
+    decodeCustomBase64(str) {
+        // The custom alphabet used by WeAreDevs obfuscator
+        // Extracted from the x={} table in the script
+        // Maps: A-Z, a-z, 0-9, +, / with shuffled values
+        const customAlphabet = {
+            'A': 0,  'B': 1,  'C': 2,  'D': 3,  'E': 4,
+            'F': 5,  'G': 6,  'H': 7,  'I': 8,  'J': 9,
+            'K': 10, 'L': 11, 'M': 12, 'N': 13, 'O': 14,
+            'P': 15, 'Q': 16, 'R': 17, 'S': 18, 'T': 19,
+            'U': 20, 'V': 21, 'W': 22, 'X': 23, 'Y': 24,
+            'Z': 25, 'a': 26, 'b': 27, 'c': 28, 'd': 29,
+            'e': 30, 'f': 31, 'g': 32, 'h': 33, 'i': 34,
+            'j': 35, 'k': 36, 'l': 37, 'm': 38, 'n': 39,
+            'o': 40, 'p': 41, 'q': 42, 'r': 43, 's': 44,
+            't': 45, 'u': 46, 'v': 47, 'w': 48, 'x': 49,
+            'y': 50, 'z': 51, '0': 52, '1': 53, '2': 54,
+            '3': 55, '4': 56, '5': 57, '6': 58, '7': 59,
+            '8': 60, '9': 61, '+': 62, '/': 63, '-': 64,
+            '*': 65, '^': 66, '!': 67, '@': 68, '#': 69,
+            '$': 70, '%': 71, '&': 72, '(': 73, ')': 74,
+            '_': 75, '=': -1 // padding
+        };
 
-    // ── MORSE CODE ──────────────────────────────────────────
-    morse(input) {
+        // The obfuscator encodes 3 bytes into 4 chars with base 64
+        // using the shuffled alphabet above
         try {
-            const map = {
-                ".-":"A","-...":"B","-.-.":"C","-..":"D",".":"E",
-                "..-.":"F","--.":"G","....":"H","..":"I",".---":"J",
-                "-.-":"K",".-..":"L","--":"M","-.":"N","---":"O",
-                ".--.":"P","--.-":"Q",".-.":"R","...":"S","-":"T",
-                "..-":"U","...-":"V",".--":"W","-..-":"X","-.--":"Y",
-                "--..":"Z",".----":"1","..---":"2","...--":"3",
-                "....-":"4",".....":"5","-....":"6","--...":"7",
-                "---..":"8","----.":"9","-----":"0",".-.-.-":".",
-                "--..--":",","..--..":"?",".----.":"'","-.-.--":"!",
-                "-..-.":"/","-.--.":"(",  "-.--.-":")",".-...":"&",
-                "---...":":","-.-.-.":";","-...-":"=",".-.-.":"+",
-                "-....-":"-","..--.-":"_",".-..-.":'"',".--.-.":"@"
-            };
+            const cleaned = str.replace(/=+$/, '');
+            if (cleaned.length === 0) return str;
 
-            if (!/^[\.\-\s\/]+$/.test(input.trim())) return null;
+            // Check if it looks like custom base64
+            let validChars = 0;
+            for (const ch of cleaned) {
+                if (customAlphabet[ch] !== undefined && customAlphabet[ch] !== -1) validChars++;
+            }
+            if (validChars / cleaned.length < 0.8) return str;
 
-            const words = input.trim().split(/\s{2,}|\//);
-            let result = "";
+            let bits = 0;
+            let bitsCount = 0;
+            let result = '';
 
-            for (const word of words) {
-                for (const letter of word.trim().split(/\s+/)) {
-                    if (!letter) continue;
-                    if (!map[letter]) return null;
-                    result += map[letter];
+            for (const ch of cleaned) {
+                const val = customAlphabet[ch];
+                if (val === undefined || val === -1) continue;
+
+                bits = (bits << 6) | val;
+                bitsCount += 6;
+
+                if (bitsCount >= 8) {
+                    bitsCount -= 8;
+                    const byte = (bits >> bitsCount) & 0xFF;
+                    if (byte >= 32 && byte <= 126) {
+                        result += String.fromCharCode(byte);
+                    } else if (byte === 10 || byte === 13 || byte === 9) {
+                        result += String.fromCharCode(byte);
+                    } else {
+                        return str; // not valid ascii text, return original
+                    }
+                    bits &= (1 << bitsCount) - 1;
                 }
-                result += " ";
             }
 
-            return { method: "Morse Code", category: "cipher", result: result.trim() };
-        } catch { return null; }
-    }
+            return result.length > 0 ? result : str;
+        } catch {
+            return str;
+        }
+    },
 
-    // ── BACON CIPHER ────────────────────────────────────────
-    bacon(input) {
+    // ── STEP 4b: DECODE USING EXTRACTED X TABLE VALUES ──────
+    decodeWithXTable(str, xTable) {
+        // The script's x table maps specific chars to integer values
+        // This is used for the base64 decoding process
+        // xTable = { char: value }
+
         try {
-            const clean = input.toUpperCase().replace(/\s+/g, "");
-            if (!/^[AB]+$/.test(clean) || clean.length % 5 !== 0 || clean.length < 5) return null;
+            if (!str || str.length === 0) return { decoded: str, method: 'empty' };
 
-            const map = {
-                "AAAAA":"A","AAAAB":"B","AAABA":"C","AAABB":"D",
-                "AABAA":"E","AABAB":"F","AABBA":"G","AABBB":"H",
-                "ABAAA":"I","ABAAB":"J","ABABA":"K","ABABB":"L",
-                "ABBAA":"M","ABBAB":"N","ABBBA":"O","ABBBB":"P",
-                "BAAAA":"Q","BAAAB":"R","BAABA":"S","BAABB":"T",
-                "BABAA":"U","BABAB":"V","BABBA":"W","BABBB":"X",
-                "BAAAA":"Y","BAAAB":"Z"
-            };
+            let bits = 0;
+            let bitsCount = 0;
+            let result = '';
+            let q = 0;
+            let s_val = 0;
+            const chars = [];
 
-            let result = "";
-            for (let i = 0; i < clean.length; i += 5) {
-                const chunk = clean.substr(i, 5);
-                if (!map[chunk]) return null;
-                result += map[chunk];
+            for (let i = 0; i < str.length; i++) {
+                const ch = str[i];
+
+                if (ch === '=') {
+                    // padding
+                    const byteVal = Math.floor(s_val / (64 * 64));
+                    if (byteVal > 0) chars.push(String.fromCharCode(byteVal));
+                    if (i >= str.length - 1 || str[i+1] !== '=') {
+                        const b2 = Math.floor((s_val % (64 * 64)) / 64);
+                        if (b2 > 0) chars.push(String.fromCharCode(b2));
+                    }
+                    break;
+                }
+
+                const val = xTable[ch];
+                if (val === undefined) {
+                    return { decoded: str, method: 'invalid_char' };
+                }
+
+                s_val += val * Math.pow(64, (3 - q));
+                q++;
+
+                if (q === 4) {
+                    q = 0;
+                    const b1 = Math.floor(s_val / (256 * 256));
+                    const b2 = Math.floor((s_val % (256 * 256)) / 256);
+                    const b3 = s_val % 256;
+                    chars.push(String.fromCharCode(b1, b2, b3));
+                    s_val = 0;
+                }
             }
 
-            return { method: "Bacon Cipher", category: "cipher", result };
-        } catch { return null; }
-    }
+            result = chars.join('');
+            // filter printable
+            const printable = result.split('').filter(c => {
+                const code = c.charCodeAt(0);
+                return (code >= 32 && code <= 126) || code === 10 || code === 13 || code === 9;
+            });
 
-    // ── RAIL FENCE ──────────────────────────────────────────
-    railFence(input, rails) {
-        try {
-            if (input.length < rails) return null;
-            const len = input.length;
-            const fence = Array.from({ length: rails }, () => Array(len).fill(""));
-            let r = 0, dir = 1;
-
-            for (let i = 0; i < len; i++) {
-                fence[r][i] = "*";
-                if (r === 0) dir = 1;
-                if (r === rails - 1) dir = -1;
-                r += dir;
+            if (printable.length / result.length > 0.7) {
+                return { decoded: result, method: 'xTable' };
             }
+            return { decoded: str, method: 'non_printable' };
+        } catch {
+            return { decoded: str, method: 'error' };
+        }
+    },
 
-            let idx = 0;
-            for (let row = 0; row < rails; row++)
-                for (let col = 0; col < len; col++)
-                    if (fence[row][col] === "*") fence[row][col] = input[idx++];
+    // ── STEP 4c: EXTRACT X TABLE FROM CODE ──────────────────
+    extractXTable(code) {
+        const xTable = {};
 
-            let result = "";
-            r = 0; dir = 1;
-            for (let i = 0; i < len; i++) {
-                result += fence[r][i];
-                if (r === 0) dir = 1;
-                if (r === rails - 1) dir = -1;
-                r += dir;
-            }
+        // The x table in the obfuscator script maps chars to numbers
+        // Pattern: {B=933698+-933690; Q=638503+-638472; ...}
+        // We need to extract these and evaluate the arithmetic
 
-            return { method: `Rail Fence (${rails} rails)`, category: "cipher", result };
-        } catch { return null; }
-    }
+        // Extract the x table block
+        const xMatch = code.match(/local\s+x\s*=\s*\{([\s\S]*?)\}local\s+Y\s*=\s*math/);
+        if (!xMatch) return null;
 
-    // ── VIGENERE ────────────────────────────────────────────
-    vigenere(input, key) {
-        try {
-            if (!/[a-zA-Z]/.test(input)) return null;
-            let result = "";
-            let ki = 0;
-            for (const ch of input) {
-                if (/[a-zA-Z]/.test(ch)) {
-                    const b = ch <= "Z" ? 65 : 97;
-                    const k = key[ki % key.length].toUpperCase().charCodeAt(0) - 65;
-                    result += String.fromCharCode(((ch.charCodeAt(0) - b - k + 26) % 26) + b);
-                    ki++;
+        const xContent = xMatch[1];
+
+        // Parse entries: key=value patterns
+        // Values are arithmetic expressions like 933698+-933690
+        const entryPattern = /\["?([^"=\]]+)"?\]\s*=\s*(-?\d+[+\-]\(-?\d+\)|-?\d+)/g;
+        const entryPattern2 = /([a-zA-Z])\s*=\s*(-?\d+[+\-]\(-?\d+\)|-?\d+)/g;
+
+        const evalArith = (expr) => {
+            try {
+                // Safe arithmetic eval: only numbers and +-
+                const safe = expr.replace(/[^0-9+\-()]/g, '');
+                return Function('"use strict"; return (' + safe + ')')();
+            } catch { return 0; }
+        };
+
+        let m;
+        while ((m = entryPattern.exec(xContent)) !== null) {
+            xTable[m[1]] = evalArith(m[2]);
+        }
+        while ((m = entryPattern2.exec(xContent)) !== null) {
+            if (!xTable[m[1]]) xTable[m[1]] = evalArith(m[2]);
+        }
+
+        return Object.keys(xTable).length > 0 ? xTable : null;
+    },
+
+    // ── STEP 5: FULL DECODE PIPELINE ────────────────────────
+    decode(code) {
+        const result = {
+            detected: false,
+            version: 'unknown',
+            strings: [],
+            decodedStrings: [],
+            xTable: null,
+            stats: {
+                total: 0,
+                decoded: 0,
+                failed: 0
+            },
+            reconstructed: '',
+            analysis: {}
+        };
+
+        // Step 1: Detect
+        const detection = this.detect(code);
+        result.detected = detection.detected;
+        result.version = detection.version;
+        result.stats.score = detection.score;
+
+        if (!detection.detected) {
+            result.error = "Script does not appear to be WeAreDevs obfuscated (score: " + detection.score + "/6)";
+        }
+
+        // Step 2: Extract strings from S table
+        const rawStrings = this.extractSTable(code);
+        result.strings = rawStrings;
+        result.stats.total = rawStrings.length;
+
+        // Step 3: Extract X table (the encoding alphabet/values)
+        const xTable = this.extractXTable(code);
+        result.xTable = xTable;
+
+        // Step 4: Decode all strings
+        for (let i = 0; i < rawStrings.length; i++) {
+            const raw = rawStrings[i];
+
+            // 3a: Decode decimal escapes first
+            const afterDecimal = this.decodeDecimalEscapes(raw);
+
+            // 3b: Try custom base64 with x table
+            let final = afterDecimal;
+            let method = 'decimal_only';
+
+            if (xTable) {
+                const xResult = this.decodeWithXTable(afterDecimal, xTable);
+                if (xResult.decoded !== afterDecimal) {
+                    final = xResult.decoded;
+                    method = 'xTable_b64';
+                    result.stats.decoded++;
                 } else {
-                    result += ch;
+                    // Try standard custom b64
+                    const b64Result = this.decodeCustomBase64(afterDecimal);
+                    if (b64Result !== afterDecimal) {
+                        final = b64Result;
+                        method = 'custom_b64';
+                        result.stats.decoded++;
+                    } else {
+                        method = 'decimal_only';
+                        if (afterDecimal !== raw) result.stats.decoded++;
+                    }
+                }
+            } else {
+                const b64Result = this.decodeCustomBase64(afterDecimal);
+                if (b64Result !== afterDecimal) {
+                    final = b64Result;
+                    method = 'custom_b64';
+                    result.stats.decoded++;
+                } else if (afterDecimal !== raw) {
+                    result.stats.decoded++;
                 }
             }
-            return { method: `Vigenère (key: "${key}")`, category: "cipher", result };
-        } catch { return null; }
-    }
 
-    // ── XOR BRUTE FORCE ─────────────────────────────────────
-    xor(input) {
-        const results = [];
-        try {
-            const clean = input.replace(/\s+/g, "").replace(/0x/gi, "");
-            if (!/^[0-9a-fA-F]+$/.test(clean) || clean.length % 2 !== 0 || clean.length < 4) return results;
+            result.decodedStrings.push({
+                index: i + 1,
+                raw: raw,
+                afterDecimal: afterDecimal,
+                final: final,
+                method: method,
+                changed: final !== raw
+            });
+        }
 
-            const bytes = [];
-            for (let i = 0; i < clean.length; i += 2)
-                bytes.push(parseInt(clean.substr(i, 2), 16));
+        // Step 5: Extract additional patterns from full code
+        // Find all decimal escape sequences in the entire script
+        const allDecimalStrings = [];
+        const fullStrPattern = /"((?:[^"\\]|\\[0-9]+)*)"/g;
+        let fMatch;
+        let searchCode = code.slice(0, 10000); // first 10k chars
 
-            for (let key = 1; key <= 255; key++) {
-                const decoded = bytes.map(b => String.fromCharCode(b ^ key)).join("");
-                const ok = decoded.split("").every(c => c.charCodeAt(0) >= 32 && c.charCodeAt(0) <= 126);
-                if (ok)
-                    results.push({
-                        method: `XOR (key: 0x${key.toString(16).padStart(2,"0")} = ${key})`,
-                        category: "cipher",
-                        result: decoded
-                    });
+        while ((fMatch = fullStrPattern.exec(searchCode)) !== null) {
+            const decoded = this.decodeDecimalEscapes(fMatch[1]);
+            if (decoded !== fMatch[1] && decoded.length > 0) {
+                allDecimalStrings.push({
+                    raw: fMatch[1],
+                    decoded: decoded,
+                    position: fMatch.index
+                });
             }
-        } catch {}
-        return results;
-    }
+        }
 
-    // ── HASH IDENTIFIER ─────────────────────────────────────
-    identifyHash(input) {
-        const t = input.trim();
-        const found = [];
+        result.allDecimalStrings = allDecimalStrings;
 
-        const patterns = [
-            { re: /^[a-f0-9]{8}$/i,   name: "CRC32 / Adler32" },
-            { re: /^[a-f0-9]{16}$/i,  name: "MySQL / Half-MD5 / FNV-64" },
-            { re: /^[a-f0-9]{32}$/i,  name: "MD5 / MD4 / NTLM / LM" },
-            { re: /^[a-f0-9]{40}$/i,  name: "SHA-1 / RIPEMD-160" },
-            { re: /^[a-f0-9]{56}$/i,  name: "SHA-224 / SHA3-224" },
-            { re: /^[a-f0-9]{64}$/i,  name: "SHA-256 / SHA3-256 / BLAKE2s-256" },
-            { re: /^[a-f0-9]{96}$/i,  name: "SHA-384 / SHA3-384" },
-            { re: /^[a-f0-9]{128}$/i, name: "SHA-512 / SHA3-512 / BLAKE2b-512" },
-            { re: /^\$2[aby]\$\d{2}\$.{53}$/, name: "Bcrypt" },
-            { re: /^\$1\$/, name: "MD5-Crypt (Linux)" },
-            { re: /^\$5\$/, name: "SHA-256-Crypt (Linux)" },
-            { re: /^\$6\$/, name: "SHA-512-Crypt (Linux)" },
-            { re: /^\$argon2(i|d|id)\$/, name: "Argon2" },
-            { re: /^pbkdf2/i, name: "PBKDF2" },
-            { re: /^scrypt\$/i, name: "Scrypt" }
+        // Step 5: Build reconstructed script
+        result.reconstructed = this.buildReconstructed(code, result.decodedStrings, allDecimalStrings);
+
+        // Analysis
+        result.analysis = this.analyze(code, result);
+
+        return result;
+    },
+
+    // ── BUILD RECONSTRUCTED SCRIPT ───────────────────────────
+    buildReconstructed(code, decodedStrings, allDecimalStrings) {
+        let output = '-- ====================================================\n';
+        output += '-- DECODED by WeAreDevs Decoder\n';
+        output += '-- Original: wearedevs.net/obfuscator v1.0.0\n';
+        output += '-- NOTE: Layer 3 (VM bytecode) cannot be fully decompiled\n';
+        output += '--       without executing the script. Strings are decoded.\n';
+        output += '-- ====================================================\n\n';
+
+        output += '-- DECODED STRING TABLE:\n';
+        output += '-- (These are the actual string values used by the script)\n\n';
+
+        for (const s of decodedStrings) {
+            if (s.final && s.final.trim().length > 0) {
+                output += `-- [${s.index}] "${s.final.replace(/\n/g,'\\n')}"\n`;
+            }
+        }
+
+        output += '\n-- ALL DECIMAL-ESCAPED STRINGS FOUND IN SCRIPT:\n\n';
+        const seen = new Set();
+        for (const s of allDecimalStrings) {
+            if (!seen.has(s.decoded) && s.decoded.length > 1) {
+                seen.add(s.decoded);
+                output += `-- Position ${s.position}: "${s.decoded.replace(/\n/g,'\\n')}"\n`;
+            }
+        }
+
+        output += '\n-- ====================================================\n';
+        output += '-- OBFUSCATED CODE (structural view):\n';
+        output += '-- The VM bytecode cannot be reconstructed without execution\n';
+        output += '-- ====================================================\n\n';
+
+        // Show a partially cleaned version
+        let cleaned = code;
+        // Replace decimal escapes in the code for readability
+        cleaned = cleaned.replace(/"((?:[^"\\]|\\[0-9]+)*)"/g, (match, inner) => {
+            const decoded = this.decodeDecimalEscapes(inner);
+            if (decoded !== inner) return `"${decoded.replace(/"/g, '\\"')}"`;
+            return match;
+        });
+
+        output += cleaned.substring(0, 3000);
+        if (cleaned.length > 3000) {
+            output += '\n\n-- ... [script truncated for display, ' + cleaned.length + ' chars total] ...';
+        }
+
+        return output;
+    },
+
+    // ── ANALYZE ─────────────────────────────────────────────
+    analyze(code, result) {
+        const analysis = {};
+
+        // Detect what APIs/functions are referenced
+        const luaAPIs = [
+            'game', 'workspace', 'Players', 'LocalPlayer',
+            'HttpGet', 'loadstring', 'getfenv', 'setfenv',
+            'require', 'pcall', 'xpcall', 'coroutine',
+            'Instance.new', 'script', 'RemoteEvent', 'RemoteFunction',
+            'BindableEvent', 'UserInputService', 'RunService',
+            'ReplicatedStorage', 'ServerStorage', 'StarterGui',
+            'TweenService', 'CFrame', 'Vector3', 'Color3',
+            'string.', 'table.', 'math.', 'io.', 'os.',
+            'getgenv', '_G', 'shared', 'rawget', 'rawset',
+            'debug.', 'setmetatable', 'getmetatable', 'newproxy',
+            'HttpService', 'DataStore', 'task.wait', 'wait(',
+            'spawn(', 'delay(', 'print(', 'warn(', 'error(',
+            'while true', 'for i', 'repeat until'
         ];
 
-        for (const p of patterns)
-            if (p.re.test(t)) found.push(p.name);
+        const found = [];
+        const allText = result.decodedStrings.map(s => s.final).join(' ') + code;
 
-        return found;
+        for (const api of luaAPIs) {
+            if (allText.includes(api)) found.push(api);
+        }
+
+        analysis.apis = found;
+        analysis.hasLoadstring = allText.includes('loadstring');
+        analysis.hasHttpGet = allText.includes('HttpGet') || allText.includes('http');
+        analysis.hasRemoteEvents = allText.includes('RemoteEvent') || allText.includes('RemoteFunction');
+        analysis.hasGetfenv = allText.includes('getfenv') || allText.includes('getgenv');
+        analysis.scriptSize = code.length;
+        analysis.stringCount = result.strings.length;
+
+        // Check for game identifier
+        const gameMatch = code.match(/Identifier\s*=\s*"([^"]+)"/);
+        analysis.gameIdentifier = gameMatch ? gameMatch[1] : null;
+
+        // Get all readable strings
+        const readableStrings = result.decodedStrings
+            .filter(s => s.final && s.final.trim().length > 2)
+            .map(s => s.final.trim());
+
+        analysis.readableStrings = [...new Set(readableStrings)];
+
+        return analysis;
     }
-
-    // ── MAIN: DECODE ALL ────────────────────────────────────
-    decodeAll(input, filter = "all") {
-        const results = [];
-
-        const add = (r) => {
-            if (r && r.result && r.result !== input && r.result.trim() !== "") {
-                if (filter === "all" || r.category === filter)
-                    results.push(r);
-            }
-        };
-
-        const addMany = (arr) => {
-            if (Array.isArray(arr)) arr.forEach(add);
-        };
-
-        add(this.base64(input));
-        add(this.base32(input));
-        add(this.hex(input));
-        add(this.jwt(input));
-        add(this.binary(input));
-        add(this.octal(input));
-        add(this.decimal(input));
-        add(this.url(input));
-        add(this.html(input));
-        add(this.unicode(input));
-        add(this.rot13(input));
-        add(this.atbash(input));
-        add(this.reverse(input));
-        add(this.morse(input));
-        add(this.bacon(input));
-
-        for (let r = 2; r <= 5; r++) add(this.railFence(input, r));
-
-        addMany(this.allROT(input));
-
-        const viKeys = ["KEY","SECRET","PASSWORD","CIPHER","CODE","HACK","FLAG","CTF","LEMON","CRYPTO"];
-        for (const k of viKeys) add(this.vigenere(input, k));
-
-        addMany(this.xor(input));
-
-        return results;
-    }
-}
+};
 
 // ============================================================
 //  UI LOGIC
 // ============================================================
 
-const engine = new Decoder();
+let currentResult = null;
 
-function updateCount() {
-    const len = document.getElementById("inputText").value.length;
-    document.getElementById("charCount").textContent = `${len.toLocaleString()} chars`;
+function setStep(num, status, text) {
+    const card = document.getElementById(`step${num}`);
+    const statusEl = document.getElementById(`step${num}-status`);
+    card.className = `step-card ${status === 'done' ? 'done' : status === 'error' ? 'error' : 'active'}`;
+    statusEl.className = `step-status ${status === 'done' ? 'ok' : status === 'error' ? 'err' : 'running'}`;
+    statusEl.textContent = text;
 }
 
-function handleKey(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") runDecode();
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
 }
 
-function tryEx(text) {
-    document.getElementById("inputText").value = text;
-    updateCount();
-    runDecode();
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 }
 
-function clearAll() {
-    document.getElementById("inputText").value = "";
-    document.getElementById("charCount").textContent = "0 chars";
-    document.getElementById("results").innerHTML = `
-        <div class="placeholder">
-            <div class="icon">🔒</div>
-            <p>Enter encoded text above and click <strong>Decode All</strong></p>
-        </div>`;
+function classifyString(str) {
+    if (!str) return { type: 'empty', color: '#666' };
+    if (/^[a-zA-Z_]\w*$/.test(str)) return { type: 'identifier', color: '#88aaff' };
+    if (/^\d+(\.\d+)?$/.test(str)) return { type: 'number', color: '#ffaa44' };
+    if (str.length <= 3) return { type: 'short', color: '#aaa' };
+    if (str.includes('.') && /^[a-zA-Z_][\w.]+$/.test(str)) return { type: 'property', color: '#ff88ff' };
+    return { type: 'string', color: '#88ff88' };
 }
 
-function copyText(btn) {
-    const text = btn.closest(".result-item").querySelector(".result-text").innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        btn.textContent = "✅ Copied!";
-        btn.classList.add("copied");
-        setTimeout(() => {
-            btn.textContent = "📋 Copy";
-            btn.classList.remove("copied");
-        }, 2000);
-    });
-}
+async function decode() {
+    const code = document.getElementById('inputCode').value.trim();
 
-function categoryIcon(cat) {
-    return { encoding: "📦", cipher: "🔐", binary: "💾", web: "🌐" }[cat] || "🔓";
-}
-
-function categoryClass(cat) {
-    return `method-${cat}`;
-}
-
-function badgeClass(cat) {
-    return `badge-${cat}`;
-}
-
-function escapeHTML(s) {
-    return s
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;");
-}
-
-function runDecode() {
-    const input = document.getElementById("inputText").value.trim();
-    const filter = document.getElementById("filterSelect").value;
-    const resultsDiv = document.getElementById("results");
-
-    if (!input) {
-        resultsDiv.innerHTML = `<div class="no-result">⚠️ Please enter some text first</div>`;
+    if (!code) {
+        alert('Please paste an obfuscated script first!');
         return;
     }
 
-    // show spinner
-    resultsDiv.innerHTML = `
-        <div class="loading">
-            <div class="spinner"></div>
-            <br>Analyzing input...
+    // Show steps card
+    document.getElementById('stepsCard').style.display = 'block';
+    document.getElementById('resultsCard').style.display = 'none';
+
+    // Reset steps
+    for (let i = 1; i <= 5; i++) {
+        setStep(i, 'wait', 'Waiting...');
+    }
+
+    await sleep(100);
+
+    // Step 1: Detect
+    setStep(1, 'active', '⏳ Detecting...');
+    await sleep(300);
+    const detection = WADDecoder.detect(code);
+    if (detection.detected) {
+        setStep(1, 'done', `✅ Detected v${detection.version} (score: ${detection.score}/6)`);
+    } else {
+        setStep(1, 'error', `⚠️ Low confidence (score: ${detection.score}/6) — trying anyway`);
+    }
+
+    await sleep(200);
+
+    // Step 2: Extract S Table
+    setStep(2, 'active', '⏳ Extracting...');
+    await sleep(300);
+    const rawStrings = WADDecoder.extractSTable(code);
+    setStep(2, 'done', `✅ Found ${rawStrings.length} strings`);
+
+    await sleep(200);
+
+    // Step 3: Decode decimal escapes
+    setStep(3, 'active', '⏳ Decoding...');
+    await sleep(300);
+    const sampleDecoded = WADDecoder.decodeDecimalEscapes(rawStrings[0] || '');
+    setStep(3, 'done', `✅ Decoded escape sequences`);
+
+    await sleep(200);
+
+    // Step 4: Custom base64
+    setStep(4, 'active', '⏳ Decoding custom encoding...');
+    await sleep(300);
+    const xTable = WADDecoder.extractXTable(code);
+    setStep(4, 'done', xTable
+        ? `✅ X-table extracted (${Object.keys(xTable).length} entries)`
+        : `⚠️ X-table not found, using fallback decoder`
+    );
+
+    await sleep(200);
+
+    // Step 5: Full decode
+    setStep(5, 'active', '⏳ Reconstructing...');
+    await sleep(400);
+    const result = WADDecoder.decode(code);
+    currentResult = result;
+    setStep(5, 'done', `✅ Done — ${result.stats.decoded} strings decoded`);
+
+    await sleep(200);
+
+    // Show results
+    displayResults(result);
+}
+
+function displayResults(result) {
+    document.getElementById('resultsCard').style.display = 'block';
+
+    // Update stats
+    document.getElementById('stat-strings').textContent = result.stats.total;
+    document.getElementById('stat-decoded').textContent = result.stats.decoded;
+    document.getElementById('stat-size').textContent = formatSize(result.analysis.scriptSize);
+    document.getElementById('stat-layer').textContent = '3';
+
+    // String table
+    const tbody = document.getElementById('stringTableBody');
+    tbody.innerHTML = '';
+
+    for (const s of result.decodedStrings) {
+        const cls = classifyString(s.final);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="idx">${s.index}</td>
+            <td class="raw" title="${escapeHTML(s.raw)}">${escapeHTML(s.afterDecimal.substring(0, 40))}${s.afterDecimal.length > 40 ? '...' : ''}</td>
+            <td class="decoded" style="color:${cls.color}">${escapeHTML(s.final.substring(0, 60))}${s.final.length > 60 ? '...' : ''}</td>
+            <td style="color:#888;font-size:11px;">${cls.type}</td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    // Also add all decimal strings found
+    if (result.allDecimalStrings) {
+        const seen = new Set(result.decodedStrings.map(s => s.final));
+        for (const s of result.allDecimalStrings) {
+            if (!seen.has(s.decoded)) {
+                seen.add(s.decoded);
+                const cls = classifyString(s.decoded);
+                const row = document.createElement('tr');
+                row.style.opacity = '0.7';
+                row.innerHTML = `
+                    <td class="idx">+</td>
+                    <td class="raw" title="${escapeHTML(s.raw)}">${escapeHTML(s.raw.substring(0, 40))}...</td>
+                    <td class="decoded" style="color:${cls.color}">${escapeHTML(s.decoded.substring(0, 60))}</td>
+                    <td style="color:#888;font-size:11px;">inline</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+    }
+
+    // Decoded script tab
+    document.getElementById('decodedScript').textContent = result.reconstructed;
+
+    // Raw decoded
+    const rawLines = result.decodedStrings
+        .filter(s => s.final && s.final.trim().length > 0)
+        .map(s => `[${s.index}] ${s.final}`)
+        .join('\n');
+    document.getElementById('rawOutput').textContent = rawLines;
+
+    // Analysis tab
+    const analysis = result.analysis;
+    let analysisHTML = '';
+
+    if (analysis.gameIdentifier) {
+        analysisHTML += `<div class="alert alert-success">
+            🎮 <strong>Target Game Identifier:</strong> "${escapeHTML(analysis.gameIdentifier)}"
         </div>`;
+    }
 
-    setTimeout(() => {
-        let html = "";
+    if (analysis.hasLoadstring) {
+        analysisHTML += `<div class="alert alert-warn">
+            ⚠️ <strong>loadstring() detected</strong> — script loads additional code at runtime
+        </div>`;
+    }
 
-        // Hash identification
-        const hashes = engine.identifyHash(input);
-        if (hashes.length > 0) {
-            html += `
-            <div class="hash-alert">
-                <strong>🔐 Hash Identified: ${hashes.join(" / ")}</strong>
-                <small>Hashes are one-way — they cannot be reversed or decoded.
-                Use tools like Hashcat, John the Ripper, or CrackStation to attempt cracking.</small>
-            </div>`;
-        }
+    if (analysis.hasHttpGet) {
+        analysisHTML += `<div class="alert alert-warn">
+            🌐 <strong>HTTP request detected</strong> — script may download additional code
+        </div>`;
+    }
 
-        // Decode
-        const results = engine.decodeAll(input, filter);
+    if (analysis.hasRemoteEvents) {
+        analysisHTML += `<div class="alert alert-info">
+            📡 <strong>Remote Events/Functions detected</strong> — script communicates with server
+        </div>`;
+    }
 
-        if (results.length > 0) {
-            html += `
-            <div class="results-header">
-                <span class="results-title">Results</span>
-                <span class="results-count">${results.length} found</span>
-            </div>`;
+    // APIs found
+    if (analysis.apis.length > 0) {
+        analysisHTML += `
+        <div class="card" style="background:var(--bg2); margin-top:12px;">
+            <div class="card-title">🔍 APIs / Functions Referenced</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                ${analysis.apis.map(api => `<span class="badge" style="background:rgba(68,136,255,0.1);border-color:rgba(68,136,255,0.3);color:#88aaff;">${escapeHTML(api)}</span>`).join('')}
+            </div>
+        </div>`;
+    }
 
-            results.forEach((r, i) => {
-                html += `
-                <div class="result-item ${r.category}">
-                    <div class="result-top">
-                        <div class="result-method">
-                            <span class="${categoryClass(r.category)}">
-                                ${categoryIcon(r.category)} ${escapeHTML(r.method)}
-                            </span>
-                            <span class="method-badge ${badgeClass(r.category)}">${r.category}</span>
-                        </div>
-                        <button class="copy-btn" onclick="copyText(this)">📋 Copy</button>
-                    </div>
-                    <div class="result-text">${escapeHTML(r.result)}</div>
-                </div>`;
-            });
+    // Readable strings
+    if (analysis.readableStrings.length > 0) {
+        analysisHTML += `
+        <div class="card" style="background:var(--bg2); margin-top:12px;">
+            <div class="card-title">🔤 All Decoded Strings</div>
+            <div style="font-family:Courier New;font-size:12px;line-height:2;">
+                ${analysis.readableStrings.map(s =>
+                    `<span style="background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.1);border-radius:4px;padding:2px 8px;margin:2px;display:inline-block;color:#aaffcc;">${escapeHTML(s)}</span>`
+                ).join('')}
+            </div>
+        </div>`;
+    }
 
-            html += `<div class="footer" style="margin-top:10px;">
-                ✅ All processing done in your browser — nothing is sent to any server
-            </div>`;
+    document.getElementById('analysisContent').innerHTML = analysisHTML;
 
-        } else if (hashes.length === 0) {
-            html += `
-            <div class="no-result">
-                ❌ No decodings found<br><br>
-                <small>Try switching the filter or double-check your input</small>
-            </div>`;
-        }
+    // Scroll to results
+    document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
-        resultsDiv.innerHTML = html;
-    }, 80);
+function copyScript() {
+    const text = document.getElementById('decodedScript').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyScriptBtn');
+        btn.textContent = '✅ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+}
+
+function copyRaw() {
+    const text = document.getElementById('rawOutput').textContent;
+    navigator.clipboard.writeText(text);
+}
+
+function clearAll() {
+    document.getElementById('inputCode').value = '';
+    document.getElementById('stepsCard').style.display = 'none';
+    document.getElementById('resultsCard').style.display = 'none';
+    currentResult = null;
+}
+
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + 'B';
+    return (bytes / 1024).toFixed(1) + 'KB';
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function loadSample() {
+    document.getElementById('inputCode').value = `--[[ v1.0.0 https://wearedevs.net/obfuscator ]] return(function(...)local S={"\\068\\090\\107\\082\\109\\057\\119\\082\\103\\083\\102\\073\\109\\097\\049\\108";"\\118\\087\\108\\076\\109\\079\\113\\061","","\\106\\051\\049\\102\\118\\051\\106\\074\\066\\083\\088\\085\\052\\051\\106\\120\\052\\051\\106\\070\\066\\113\\061\\061","\\106\\051\\105\\055\\052\\051\\049\\119\\109\\051\\085\\099";"\\082\\119\\107\\079\\080\\105\\061\\061"}for V,t in ipairs({{485089+-485088,510848+-510803}})do while t[1]<t[2]do S[t[1]],S[t[2]],t[1],t[2]=S[t[2]],S[t[1]],t[1]+1,t[2]-1 end end local function V(V)return S[V+(862473+-814219)]end return "decoded"end)(...)`;
 }
 </script>
 
